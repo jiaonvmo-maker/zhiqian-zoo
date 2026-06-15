@@ -1,0 +1,629 @@
+/* 猛兽派对 · 世界级设计师配色版 — 莫兰迪+活泼平衡感 */
+
+:root {
+  /* 主色调 — 克制但有活力 */
+  --pa-orange: #e07c5a;
+  --pa-orange-light: #f5c4b0;
+  --pa-orange-dark: #c4623e;
+
+  /* 金色 — 温润不刺眼 */
+  --pa-gold: #d4a853;
+  --pa-gold-light: #f0dfa8;
+  --pa-gold-dark: #b8913a;
+
+  /* 背景层次 */
+  --pa-cream: #fdfaf6;
+  --pa-paper: #f7f2ec;
+  --pa-paper-dark: #e8ddd0;
+
+  /* 棕色系文字 */
+  --pa-brown: #4a3f35;
+  --pa-brown-mid: #6b5d4f;
+  --pa-brown-light: #a09080;
+
+  /* 功能色 — 莫兰迪调 */
+  --pa-pink: #c97b8b;
+  --pa-pink-light: #ebc4d0;
+  --pa-pink-dark: #a65d6a;
+  --pa-green: #7aab8a;
+  --pa-green-light: #c2dbc4;
+  --pa-green-dark: #5c8a68;
+  --pa-blue: #7a9fc2;
+  --pa-blue-light: #b8cfe0;
+  --pa-dark: #2d2520;
+  --pa-white: #ffffff;
+
+  /* 阴影 — 暖灰调 */
+  --pa-shadow: rgba(74, 63, 53, 0.08);
+  --pa-shadow-md: rgba(74, 63, 53, 0.13);
+  --pa-shadow-lg: rgba(74, 63, 53, 0.18);
+
+  /* 圆角 — 温和圆弧 */
+  --pa-radius-sm: 10px;
+  --pa-radius-md: 14px;
+  --pa-radius-lg: 18px;
+  --pa-radius-xl: 22px;
+  --pa-radius-pill: 999px;
+}
+
+/* 背景层次 */
+.pa-bg-sky {
+  background: linear-gradient(155deg, #fdfaf6 0%, #f0ebe3 50%, #e8ddd0 100%);
+}
+
+.pa-bg-lobby {
+  background: linear-gradient(155deg, #fdfaf6 0%, #f7f2ec 100%);
+}
+
+.pa-bg-warm {
+  background: linear-gradient(155deg, #ffffff 0%, #fdfaf6 100%);
+}
+
+.pa-bg-party {
+  background: linear-gradient(155deg, #fdfaf6 0%, #f0ebe3 100%);
+}
+
+.pa-pattern::before,
+.pa-pattern::after {
+  display: none;
+}
+
+/* 字体 — 圆润可读 */
+.pa-title {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--pa-dark);
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+}
+
+.pa-subtitle {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 500;
+  color: var(--pa-brown-mid);
+  line-height: 1.55;
+}
+
+.pa-label {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--pa-brown-light);
+  letter-spacing: 0.03em;
+}
+
+/* ===== 按钮 — 精致 3D，弹跳克制 ===== */
+.pa-btn {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 2px solid var(--pa-orange-dark);
+  border-radius: var(--pa-radius-pill);
+  background: linear-gradient(175deg, #f5c4b0 0%, var(--pa-orange) 100%);
+  color: var(--pa-white);
+  box-shadow: 0 4px 0 var(--pa-orange-dark), 0 5px 12px var(--pa-shadow);
+  transition: transform 0.14s cubic-bezier(0.34, 1.5, 0.64, 1), box-shadow 0.14s ease;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+
+.pa-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.025);
+  box-shadow: 0 6px 0 var(--pa-orange-dark), 0 8px 18px var(--pa-shadow-md);
+}
+
+.pa-btn:active:not(:disabled) {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 0 var(--pa-orange-dark), 0 3px 8px var(--pa-shadow);
+}
+
+.pa-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pa-btn-pink {
+  border-color: var(--pa-pink-dark);
+  background: linear-gradient(175deg, #ebc4d0 0%, var(--pa-pink) 100%);
+  box-shadow: 0 4px 0 var(--pa-pink-dark), 0 5px 12px rgba(201, 123, 139, 0.2);
+}
+
+.pa-btn-pink:hover:not(:disabled) {
+  box-shadow: 0 6px 0 var(--pa-pink-dark), 0 8px 18px rgba(201, 123, 139, 0.25);
+}
+
+.pa-btn-cream {
+  border-color: var(--pa-paper-dark);
+  background: var(--pa-white);
+  color: var(--pa-brown);
+  box-shadow: 0 4px 0 var(--pa-paper-dark), 0 5px 12px var(--pa-shadow);
+}
+
+.pa-btn-cream:hover:not(:disabled) {
+  background: var(--pa-paper);
+  box-shadow: 0 6px 0 var(--pa-paper-dark), 0 8px 18px var(--pa-shadow-md);
+}
+
+.pa-btn-green {
+  border-color: var(--pa-green-dark);
+  background: linear-gradient(175deg, var(--pa-green-light) 0%, var(--pa-green) 100%);
+  color: var(--pa-dark);
+  box-shadow: 0 4px 0 var(--pa-green-dark), 0 5px 12px rgba(122, 171, 138, 0.2);
+}
+
+.pa-btn-green:hover:not(:disabled) {
+  box-shadow: 0 6px 0 var(--pa-green-dark), 0 8px 18px rgba(122, 171, 138, 0.25);
+}
+
+.pa-btn-dept {
+  color: var(--pa-white);
+  border-color: var(--pa-orange-dark);
+  background: linear-gradient(175deg, #f5c4b0 0%, var(--pa-orange) 100%);
+  box-shadow: 0 4px 0 var(--pa-orange-dark), 0 5px 12px var(--pa-shadow);
+}
+
+/* ===== 面板 — 精致层次感 ===== */
+.pa-panel {
+  background: var(--pa-white);
+  border: 1.5px solid var(--pa-paper-dark);
+  border-radius: var(--pa-radius-lg);
+  box-shadow: 0 3px 0 var(--pa-paper-dark), 0 5px 16px var(--pa-shadow);
+}
+
+.pa-panel-accent {
+  border-color: var(--pa-orange);
+  box-shadow: 0 3px 0 var(--pa-orange-dark), 0 5px 16px rgba(224, 124, 90, 0.12);
+}
+
+.pa-glass-card,
+.pa-hero-card {
+  background: var(--pa-white);
+  border: 1.5px solid var(--pa-paper-dark);
+  border-radius: var(--pa-radius-xl);
+  box-shadow: 0 4px 0 var(--pa-paper-dark), 0 6px 20px var(--pa-shadow);
+}
+
+.pa-hud {
+  background: rgba(253, 250, 246, 0.97);
+  border-bottom: 2px solid var(--pa-paper-dark);
+  box-shadow: 0 2px 8px var(--pa-shadow);
+  padding-top: max(14px, env(safe-area-inset-top));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+/* ===== 标签 — 柔和药丸 ===== */
+.pa-tag {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--pa-radius-pill);
+  border: 1.5px solid var(--pa-gold-dark);
+  background: var(--pa-gold-light);
+  color: var(--pa-brown);
+  letter-spacing: 0.02em;
+}
+
+.pa-tag-pink {
+  border-color: var(--pa-pink-dark);
+  background: var(--pa-pink-light);
+  color: var(--pa-pink-dark);
+}
+
+/* ===== 聊天气泡 — 温和不对称的圆角 ===== */
+.pa-bubble-user {
+  background: linear-gradient(135deg, var(--pa-orange) 0%, var(--pa-pink) 100%);
+  color: var(--pa-white);
+  border-radius: 18px 8px 18px 18px;
+  font-weight: 500;
+}
+
+.pa-bubble-npc {
+  background: var(--pa-paper);
+  color: var(--pa-dark);
+  border: 1.5px solid var(--pa-paper-dark);
+  border-radius: 8px 18px 18px 18px;
+  font-weight: 500;
+}
+
+/* ===== 图标按钮 ===== */
+.pa-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--pa-paper-dark);
+  border-radius: 50%;
+  background: var(--pa-white);
+  box-shadow: 0 2px 0 var(--pa-paper-dark);
+  cursor: pointer;
+  transition: transform 0.14s cubic-bezier(0.34, 1.5, 0.64, 1), box-shadow 0.14s ease;
+}
+
+.pa-icon-btn:hover {
+  transform: translateY(-1px) scale(1.06);
+  box-shadow: 0 4px 0 var(--pa-paper-dark);
+}
+
+.pa-icon-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--pa-paper-dark);
+}
+
+/* ===== 进度条 ===== */
+.pa-progress-track {
+  background: var(--pa-paper-dark);
+  border-radius: var(--pa-radius-pill);
+  overflow: hidden;
+  height: 8px;
+}
+
+.pa-progress-fill {
+  background: linear-gradient(90deg, var(--pa-orange), var(--pa-gold));
+  border-radius: var(--pa-radius-pill);
+  height: 100%;
+}
+
+.pa-step-dot {
+  height: 6px;
+  flex: 1;
+  border-radius: var(--pa-radius-pill);
+  transition: all 0.3s cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+
+.pa-overlay {
+  background: rgba(45, 37, 32, 0.4);
+}
+
+.pa-content-layer {
+  position: relative;
+  z-index: 10;
+}
+
+/* 角色展示 */
+.pa-character {
+  display: block;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.12));
+  user-select: none;
+  pointer-events: none;
+}
+
+.pa-character-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: visible;
+}
+
+.pa-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pa-brown-light) transparent;
+}
+
+.pa-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.pa-scroll::-webkit-scrollbar-thumb {
+  background: var(--pa-brown-light);
+  border-radius: var(--pa-radius-pill);
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== 动画 — 克制但有弹力 ===== */
+
+/* 上下轻弹 */
+@keyframes pa-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* 走路歪歪扭扭 */
+@keyframes pa-wobble-walk {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-3px) rotate(-2deg); }
+  40% { transform: translateX(2px) rotate(1.5deg) translateY(-1px); }
+  60% { transform: translateX(-2px) rotate(-1deg); }
+  80% { transform: translateX(2px) rotate(1.5deg); }
+}
+
+/* 摇晃 */
+@keyframes pa-wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20% { transform: rotate(-3deg) scale(1.02); }
+  40% { transform: rotate(2.5deg) scale(0.99); }
+  60% { transform: rotate(-2deg) scale(1.01); }
+  80% { transform: rotate(1.5deg); }
+}
+
+/* 抠屁股 — 夸张缩放+旋转 */
+@keyframes pa-booty-shake {
+  0%, 100% { transform: rotate(0deg) scaleX(1) scaleY(1); }
+  20% { transform: rotate(-4deg) scaleX(1.06) scaleY(0.96); }
+  40% { transform: rotate(3deg) scaleX(0.96) scaleY(1.04); }
+  60% { transform: rotate(-2.5deg) scaleX(1.04) scaleY(0.98); }
+  80% { transform: rotate(1.5deg) scaleX(0.98) scaleY(1.02); }
+}
+
+/* 弹跳进入 */
+@keyframes pa-bounce-in {
+  0% { opacity: 0; transform: scale(0.4) translateY(24px); }
+  55% { transform: scale(1.06) translateY(-4px); }
+  75% { transform: scale(0.97) translateY(2px); }
+  90% { transform: scale(1.02) translateY(-1px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pa-spring-up {
+  0% { opacity: 0; transform: translateY(18px); }
+  60% { transform: translateY(-3px) scale(1.01); }
+  80% { transform: translateY(1px) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pa-slide-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pa-slide-down {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pa-scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 摇晃抖动 */
+@keyframes pa-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px) rotate(-1.5deg); }
+  40% { transform: translateX(5px) rotate(1.5deg); }
+  60% { transform: translateX(-3px) rotate(-1deg); }
+  80% { transform: translateX(3px) rotate(1deg); }
+}
+
+@keyframes pa-float-shadow {
+  0%, 100% { transform: translateY(0); filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1)); }
+  50% { transform: translateY(-7px); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15)); }
+}
+
+@keyframes pa-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 轻弹 */
+@keyframes pa-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.12) rotate(-1.5deg); }
+  60% { transform: scale(0.96) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* 微弹 */
+@keyframes pa-micro-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* 动画类 */
+.pa-float { animation: pa-float 3s ease-in-out infinite; }
+.pa-wobble-walk { animation: pa-wobble-walk 1.2s ease-in-out infinite; }
+.pa-wiggle { animation: pa-wiggle 0.45s ease-in-out; }
+.pa-booty-shake { animation: pa-booty-shake 0.55s ease-in-out; }
+.pa-shake { animation: pa-shake 0.4s ease-in-out; }
+.pa-bounce-in { animation: pa-bounce-in 0.5s cubic-bezier(0.34, 1.6, 0.64, 1) forwards; }
+.pa-spring-up { animation: pa-spring-up 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+.pa-slide-up { animation: pa-slide-up 0.3s ease-out forwards; }
+.pa-slide-down { animation: pa-slide-down 0.3s ease-out forwards; }
+.pa-scale-in { animation: pa-scale-in 0.28s ease-out forwards; }
+.pa-float-shadow { animation: pa-float-shadow 3s ease-in-out infinite; }
+.pa-pop { animation: pa-pop 0.38s cubic-bezier(0.34, 1.5, 0.64, 1); }
+.pa-micro-bounce { animation: pa-micro-bounce 0.6s ease-in-out infinite; }
+
+/* Skeleton */
+.pa-skeleton {
+  background: linear-gradient(90deg, var(--pa-paper) 25%, var(--pa-paper-dark) 50%, var(--pa-paper) 75%);
+  background-size: 200% 100%;
+  animation: pa-shimmer 1.6s infinite;
+  border-radius: var(--pa-radius-sm);
+}
+
+/* 渐变文字 */
+.pa-gradient-text {
+  background: linear-gradient(135deg, var(--pa-orange), var(--pa-pink), var(--pa-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 玻璃态 */
+.pa-glass {
+  background: rgba(253, 250, 246, 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(232, 221, 208, 0.6);
+  border-radius: var(--pa-radius-lg);
+}
+
+/* 触摸友好 */
+.pa-touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* 一致性面板 */
+.pa-panel-consistent {
+  border-radius: var(--pa-radius-lg);
+  border: 1.5px solid var(--pa-paper-dark);
+  box-shadow: 0 3px 0 var(--pa-paper-dark), 0 5px 16px var(--pa-shadow);
+  transition: transform 0.15s cubic-bezier(0.34, 1.5, 0.64, 1), box-shadow 0.15s ease;
+}
+
+.pa-panel-consistent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--pa-paper-dark), 0 8px 20px var(--pa-shadow-md);
+}
+
+/* 按钮高度 */
+.pa-btn-height {
+  height: 44px;
+  min-height: 44px;
+}
+
+/* 输入框 */
+.pa-input {
+  height: 44px;
+  padding: 0 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  outline: none;
+  border: 1.5px solid var(--pa-paper-dark);
+  border-radius: var(--pa-radius-md);
+  background: var(--pa-white);
+  color: var(--pa-dark);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+  font-family: 'Nunito', system-ui, sans-serif;
+}
+
+.pa-input:focus {
+  border-color: var(--pa-orange);
+  box-shadow: 0 0 0 3px rgba(224, 124, 90, 0.12), 0 2px 0 var(--pa-orange-dark);
+  transform: translateY(-1px);
+}
+
+.pa-input::placeholder {
+  color: var(--pa-brown-light);
+  font-weight: 400;
+}
+
+/* 消息气泡 */
+.pa-message {
+  max-width: 80%;
+  padding: 10px 16px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  word-break: break-word;
+  font-family: 'Nunito', system-ui, sans-serif;
+}
+
+.pa-message-user {
+  composes: pa-message;
+  background: linear-gradient(135deg, var(--pa-orange) 0%, var(--pa-pink) 100%);
+  color: var(--pa-white);
+  border-radius: 18px 8px 18px 18px;
+}
+
+.pa-message-npc {
+  composes: pa-message;
+  background: var(--pa-paper);
+  color: var(--pa-dark);
+  border: 1.5px solid var(--pa-paper-dark);
+  border-radius: 8px 18px 18px 18px;
+}
+
+/* 标签 */
+.pa-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--pa-radius-pill);
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  border: 1.5px solid transparent;
+}
+
+.pa-badge-gold {
+  composes: pa-badge;
+  border-color: var(--pa-gold-dark);
+  background: var(--pa-gold-light);
+  color: var(--pa-brown);
+}
+
+.pa-badge-pink {
+  composes: pa-badge;
+  border-color: var(--pa-pink-dark);
+  background: var(--pa-pink-light);
+  color: var(--pa-pink-dark);
+}
+
+.pa-badge-green {
+  composes: pa-badge;
+  border-color: var(--pa-green-dark);
+  background: var(--pa-green-light);
+  color: var(--pa-green-dark);
+}
+
+/* 移动端 */
+@media (hover: none) {
+  .pa-btn:hover:not(:disabled) {
+    transform: none;
+    box-shadow: 0 4px 0 var(--pa-orange-dark), 0 5px 12px var(--pa-shadow);
+  }
+
+  .pa-panel-consistent:hover {
+    transform: none;
+  }
+}
+
+/* 安全区域 */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .pa-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ===== 特效工具 ===== */
+
+/* 底部 3D 边框 */
+.pa-3d-base {
+  border-bottom: 3px solid var(--pa-paper-dark);
+  box-shadow: 0 3px 0 var(--pa-paper-dark);
+}
+
+/* 弹跳 hover */
+.pa-bouncy-hover {
+  transition: transform 0.15s cubic-bezier(0.34, 1.5, 0.64, 1), box-shadow 0.15s ease;
+}
+
+.pa-bouncy-hover:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* 按压 */
+.pa-press:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 1px 0 var(--pa-paper-dark);
+}
+
+/* 微弹idle */
+.pa-idle-bounce {
+  animation: pa-micro-bounce 0.7s ease-in-out infinite;
+}
+
+/* 强调描边 */
+.pa-glow-accent {
+  box-shadow: 0 0 0 2px var(--pa-orange), 0 3px 10px rgba(224, 124, 90, 0.18);
+}
+
+/* 随机微旋转 — 让列表姿态不同 */
+.pa-tilt-1 { transform: rotate(-0.6deg); }
+.pa-tilt-2 { transform: rotate(0.5deg); }
+.pa-tilt-3 { transform: rotate(-0.3deg); }
+.pa-tilt-4 { transform: rotate(0.7deg); }
