@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Monitor, ChevronUp, Building2 } from 'lucide-react';
 import type { TermItem, ToolItem, LearnLevel } from '@/data/workMomentTypes';
@@ -174,6 +174,21 @@ export function StepKnowledgePanel({
   const hasTools = (tools?.length ?? 0) > 0;
   const [tab, setTab] = useState<Tab>('terms');
   const [open, setOpen] = useState(true);
+  const [showCollapseHint, setShowCollapseHint] = useState(true);
+
+  useEffect(() => {
+    if (!open || !showCollapseHint) return;
+    const timer = setTimeout(() => setShowCollapseHint(false), 3200);
+    return () => clearTimeout(timer);
+  }, [open, showCollapseHint]);
+
+  const toggleOpen = () => {
+    setOpen((prev) => {
+      if (prev) setShowCollapseHint(false);
+      else setShowCollapseHint(true);
+      return !prev;
+    });
+  };
 
   if (!resolvedTerms.length && !hasTools) return null;
 
@@ -187,7 +202,7 @@ export function StepKnowledgePanel({
         <div className="flex items-center border-b" style={{ borderColor: color + '22', backgroundColor: color + '0a' }}>
           <button
             type="button"
-            onClick={() => setOpen(!open)}
+            onClick={toggleOpen}
             className="flex-1 flex items-center justify-between px-3 py-2 text-left min-w-0"
           >
             <span className="text-[10px] font-extrabold flex items-center gap-1 truncate" style={{ color }}>
@@ -196,9 +211,40 @@ export function StepKnowledgePanel({
               </motion.span>
               零基础小抄
             </span>
-            <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }}>
-              <ChevronUp size={14} style={{ color }} />
-            </motion.span>
+            <span className="flex items-center gap-1 shrink-0 ml-2">
+              <AnimatePresence>
+                {open && showCollapseHint && (
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.6, x: 6 }}
+                    animate={{ opacity: [0, 1, 1, 0], scale: [0.6, 1, 1, 0.85], x: [6, 0, 0, -4] }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 2.6, times: [0, 0.12, 0.72, 1], ease: 'easeOut' }}
+                    className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                    style={{ backgroundColor: color + '18', color }}
+                  >
+                    能收 ↑
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              <motion.span
+                animate={{
+                  rotate: open ? 180 : 0,
+                  y: open && showCollapseHint ? [0, -3, 0, -2, 0] : 0,
+                  scale: open && showCollapseHint ? [1, 1.12, 1, 1.08, 1] : 1,
+                }}
+                transition={{
+                  rotate: { duration: 0.25 },
+                  y: open && showCollapseHint
+                    ? { repeat: 2, duration: 0.55, ease: 'easeInOut', repeatDelay: 0.35 }
+                    : { duration: 0.2 },
+                  scale: open && showCollapseHint
+                    ? { repeat: 2, duration: 0.55, ease: 'easeInOut', repeatDelay: 0.35 }
+                    : { duration: 0.2 },
+                }}
+              >
+                <ChevronUp size={14} style={{ color }} />
+              </motion.span>
+            </span>
           </button>
         </div>
 

@@ -81,9 +81,9 @@ export default function EntryGame() {
         >
           <div className="text-5xl mb-4 inline-block">🐾</div>
           <p className="pa-label mb-2">Career Safari</p>
-          <h1 className="pa-title text-3xl sm:text-4xl tracking-tight">职前动物园</h1>
+          <h1 className="pa-title text-3xl sm:text-4xl tracking-tight">不要拍打玻璃</h1>
           <p className="pa-subtitle text-sm sm:text-base mt-3 max-w-xs mx-auto">
-            行业田野调查 · 笑着把「我该干什么」这件事搞清楚
+            啊 伟大的幻觉
           </p>
         </motion.div>
 

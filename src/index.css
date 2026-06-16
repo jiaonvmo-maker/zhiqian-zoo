@@ -45,7 +45,8 @@
 
   body {
     font-family: 'Nunito', system-ui, sans-serif;
-    @apply bg-background text-foreground antialiased;
+    background-color: #fdfaf6;
+    @apply text-foreground antialiased;
   }
 
   ::selection {

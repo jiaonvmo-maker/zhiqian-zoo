@@ -10,6 +10,7 @@ import {
   CompanyContextBanner,
 } from '@/components/WorkMomentKnowledge';
 import WorkMomentVisual from '@/components/WorkMomentVisual';
+import ChoiceReflection from '@/components/ChoiceReflection';
 
 interface ChatLine {
   from: string;
@@ -29,8 +30,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
   const [screen, setScreen] = useState<Screen>('intro');
   const [stepIdx, setStepIdx] = useState(0);
   const [log, setLog] = useState<ChatLine[]>([]);
-  const [thought, setThought] = useState<string | null>(null);
-  const [teach, setTeach] = useState<string | null>(null);
+  const [reflection, setReflection] = useState<{ thought: string; teach?: string | null; nextIdx: number; hasNext: boolean } | null>(null);
   const [waitingChoice, setWaitingChoice] = useState(false);
 
   const totalSteps = moment.steps.length;
@@ -39,11 +39,22 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
   const pushPings = useCallback((idx: number) => {
     const step = moment.steps[idx];
     if (!step) return;
-    setThought(null);
-    setTeach(null);
+    setReflection(null);
     setLog((prev) => [...prev, ...step.pings.map((p) => ({ from: p.from, text: p.text }))]);
     setWaitingChoice(true);
   }, [moment.steps]);
+
+  const completeReflection = useCallback(() => {
+    if (!reflection) return;
+    const { nextIdx, hasNext } = reflection;
+    setReflection(null);
+    if (hasNext) {
+      setStepIdx(nextIdx);
+      pushPings(nextIdx);
+    } else {
+      setScreen('ended');
+    }
+  }, [reflection, pushPings]);
 
   const startDay = () => {
     setScreen('playing');
@@ -64,20 +75,18 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
       { from: '你', text: choice.youSay, isUser: true },
       ...(choice.reply ? [{ from: choice.reply.from, text: choice.reply.text }] : []),
     ]);
-    setThought(choice.thought);
-    if (choice.teach) setTeach(choice.teach);
 
     const nextIdx = choice.next ?? stepIdx + 1;
     const hasNext = nextIdx < moment.steps.length && moment.steps[nextIdx];
 
     setTimeout(() => {
-      if (hasNext) {
-        setStepIdx(nextIdx);
-        pushPings(nextIdx);
-      } else {
-        setScreen('ended');
-      }
-    }, 900);
+      setReflection({
+        thought: choice.thought,
+        teach: choice.teach ?? null,
+        nextIdx,
+        hasNext: Boolean(hasNext),
+      });
+    }, 480);
   };
 
   const endTag = screen === 'ended'
@@ -98,7 +107,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 40 }}
-        className="w-full max-w-md h-[88vh] sm:h-[82vh] flex flex-col pa-panel pa-panel-accent overflow-hidden"
+        className="relative w-full max-w-md h-[88vh] sm:h-[82vh] flex flex-col pa-panel pa-panel-accent overflow-hidden"
         style={{ borderColor: color, borderRadius: 'var(--pa-radius-lg) var(--pa-radius-lg) 0 0' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -205,16 +214,6 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
                   </motion.div>
                 ))}
 
-                {thought && (
-                  <p className="text-[11px] leading-relaxed px-3 py-2 mx-1 rounded-xl mb-1" style={{ backgroundColor: color + '12', color: '#555', borderLeft: `3px solid ${color}` }}>
-                    💭 {thought}
-                  </p>
-                )}
-                {teach && (
-                  <p className="text-[11px] leading-relaxed px-3 py-2 mx-1 rounded-xl" style={{ backgroundColor: '#fff8e6', color: '#665', borderLeft: '3px solid var(--pa-gold)' }}>
-                    📖 {teach}
-                  </p>
-                )}
               </motion.div>
             )}
 
@@ -250,7 +249,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
           </AnimatePresence>
         </div>
 
-        {screen === 'playing' && waitingChoice && currentStep && (
+        {screen === 'playing' && waitingChoice && currentStep && !reflection && (
           <div className="shrink-0 px-3 py-3 border-t-2 space-y-2" style={{ borderColor: 'var(--pa-brown-light)' }}>
             <p className="text-[10px] font-bold pa-subtitle">这会儿你怎么回？（选完有解说）</p>
             {currentStep.choices.map((c, i) => (
@@ -270,6 +269,18 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
             ))}
           </div>
         )}
+
+        <AnimatePresence>
+          {reflection && (
+            <ChoiceReflection
+              key={`${stepIdx}-${reflection.thought}`}
+              thought={reflection.thought}
+              teach={reflection.teach}
+              color={color}
+              onComplete={completeReflection}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
   );

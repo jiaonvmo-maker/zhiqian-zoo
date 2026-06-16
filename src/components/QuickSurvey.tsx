@@ -8,6 +8,12 @@ import { defaultAvatar } from '@/data/partyAnimalsAssets';
 
 const CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`'.split('');
 
+const QUESTION_VIBES = [
+  { stamp: '测', line: '别装了，你根本没作息' },
+  { stamp: '啊这', line: '大脑开机检查中……' },
+  { stamp: '怼', line: '最后一问，憋不住了？' },
+] as const;
+
 function scrambleText(text: string, duration: number, onDone: (t: string) => void) {
   const target = text;
   let frame = 0;
@@ -135,7 +141,7 @@ export default function QuickSurvey() {
               />
             ))}
           </div>
-          <p className="pa-label">匹配题 {currentQ + 1} / {surveyQuestions.length}</p>
+          <p className="pa-label">灵魂拷问 {currentQ + 1} / {surveyQuestions.length}</p>
         </div>
 
         <AnimatePresence mode="wait">
@@ -147,9 +153,45 @@ export default function QuickSurvey() {
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="w-full max-w-sm"
           >
-            <div className="pa-panel pa-panel-accent p-6 sm:p-8 mb-6 text-center">
-              <span className="text-4xl block mb-3">🎯</span>
-              <h2 className="pa-title text-lg sm:text-xl leading-snug">{q.question}</h2>
+            <div className="pa-panel pa-panel-accent p-6 sm:p-8 mb-6 text-center relative overflow-hidden">
+              <motion.span
+                key={`${currentQ}-stamp`}
+                initial={{ scale: 0, rotate: -24 }}
+                animate={{ scale: 1, rotate: [-10, -6, -12, -8] }}
+                transition={{
+                  scale: { type: 'spring', stiffness: 480, damping: 14 },
+                  rotate: { repeat: Infinity, duration: 2.4, ease: 'easeInOut' },
+                }}
+                className="absolute top-3 right-3 px-2 py-0.5 text-[10px] font-extrabold rounded-md"
+                style={{
+                  background: 'var(--pa-orange)',
+                  color: '#fff',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
+                }}
+              >
+                {QUESTION_VIBES[currentQ].stamp}
+              </motion.span>
+              <motion.p
+                key={`${currentQ}-line`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[11px] font-extrabold mb-2 tracking-wide"
+                style={{ color: 'var(--pa-pink-dark)' }}
+              >
+                {QUESTION_VIBES[currentQ].line}
+              </motion.p>
+              <motion.h2
+                key={q.id}
+                initial={{ opacity: 0, rotate: -2 }}
+                animate={{ opacity: 1, rotate: [0, 1.2, -1, 0.6, 0] }}
+                transition={{
+                  opacity: { duration: 0.25 },
+                  rotate: { delay: 0.15, duration: 0.55, ease: 'easeOut' },
+                }}
+                className="pa-title text-lg sm:text-xl leading-snug"
+              >
+                {q.question}
+              </motion.h2>
             </div>
             <div className="space-y-2.5">
               {q.options.map((opt, i) => (

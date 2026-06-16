@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text } from '@react-three/drei';
+import { OrbitControls, RoundedBox, ContactShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { departments } from '@/data/departments';
 import { npcs } from '@/data/npcs';
@@ -17,39 +18,33 @@ import { breedFromAvatar } from '@/components/pa3d/breeds';
 import { deptMascot } from '@/data/partyAnimalsAssets';
 
 const floors = [
-  { id: 'management', name: '管理层', color: '#c9a227', icon: '👑', npcImg: deptMascot.management, width: 4.9, depth: 3.4, x: 0, z: 0 },
-  { id: 'legal', name: '法务部', color: '#8e8e93', icon: '⚖️', npcImg: deptMascot.legal, width: 4.3, depth: 3.1, x: -0.12, z: 0.05 },
-  { id: 'finance', name: '财务部', color: '#00c7be', icon: '💵', npcImg: deptMascot.finance, width: 4.6, depth: 3.25, x: 0.08, z: -0.04 },
-  { id: 'design', name: '设计部', color: '#ff2d55', icon: '🎨', npcImg: deptMascot.design, width: 4.35, depth: 3.05, x: -0.18, z: 0.1 },
-  { id: 'product', name: '产品部', color: '#34c759', icon: '💡', npcImg: deptMascot.product, width: 4.75, depth: 3.35, x: 0.15, z: -0.06 },
-  { id: 'commercial', name: '商业化', color: '#af52de', icon: '💰', npcImg: deptMascot.commercial, width: 4.4, depth: 3.15, x: -0.05, z: 0.08 },
-  { id: 'tech', name: '技术部', color: '#007aff', icon: '💻', npcImg: deptMascot.tech, width: 4.95, depth: 3.5, x: 0.12, z: -0.1 },
-  { id: 'data', name: '数据部', color: '#ff6b35', icon: '📊', npcImg: deptMascot.data, width: 4.5, depth: 3.2, x: -0.1, z: 0.04 },
-  { id: 'operation', name: '运营部', color: '#ff9500', icon: '📢', npcImg: deptMascot.operation, width: 4.7, depth: 3.3, x: 0.04, z: -0.06 },
-  { id: 'hr', name: '人事部', color: '#5856d6', icon: '👥', npcImg: deptMascot.hr, width: 4.25, depth: 3.05, x: -0.14, z: 0.08 },
-  { id: 'support', name: '支持部', color: '#64d2ff', icon: '🎧', npcImg: deptMascot.support, width: 5.15, depth: 3.65, x: 0, z: 0 },
+  { id: 'management', name: '管理层', color: '#c9a227', icon: '👑', npcImg: deptMascot.management },
+  { id: 'legal', name: '法务部', color: '#8e8e93', icon: '⚖️', npcImg: deptMascot.legal },
+  { id: 'finance', name: '财务部', color: '#00c7be', icon: '💵', npcImg: deptMascot.finance },
+  { id: 'design', name: '设计部', color: '#ff2d55', icon: '🎨', npcImg: deptMascot.design },
+  { id: 'product', name: '产品部', color: '#34c759', icon: '💡', npcImg: deptMascot.product },
+  { id: 'commercial', name: '商业化', color: '#af52de', icon: '💰', npcImg: deptMascot.commercial },
+  { id: 'tech', name: '技术部', color: '#007aff', icon: '💻', npcImg: deptMascot.tech },
+  { id: 'data', name: '数据部', color: '#ff6b35', icon: '📊', npcImg: deptMascot.data },
+  { id: 'operation', name: '运营部', color: '#ff9500', icon: '📢', npcImg: deptMascot.operation },
+  { id: 'hr', name: '人事部', color: '#5856d6', icon: '👥', npcImg: deptMascot.hr },
+  { id: 'support', name: '支持部', color: '#64d2ff', icon: '🎧', npcImg: deptMascot.support },
 ].reverse();
 
 type Floor = (typeof floors)[number];
 
-function FloorMascot({ npcImg, floorId }: { npcImg: string; floorId: string }) {
-  const breed = useMemo(() => breedFromAvatar(npcImg), [npcImg]);
-  const phase = useMemo(() => floorId.charCodeAt(0) * 0.1, [floorId]);
-  return (
-    <group position={[0, 0, 0]}>
-      <group position={[0, -0.1, 0]} rotation={[0, -0.5, 0]} scale={0.52}>
-        <PlushAnimal breed={breed} mood="idle" phase={phase} />
-      </group>
-    </group>
-  );
+const SCENE_BG = '#f7ebdd';
+const TOWER_WIDTH = 4.35;
+const TOWER_DEPTH = 3.05;
+const FLOOR_HEIGHT = 0.36;
+const FLOOR_GAP = 0.055;
+
+function softenColor(hex: string, amount = 0.32) {
+  return new THREE.Color(hex).lerp(new THREE.Color('#fff9f4'), amount).getStyle();
 }
 
-function FloorMascotMarker({ position, npcImg, floorId }: { position: [number, number, number]; npcImg: string; floorId: string }) {
-  return (
-    <group position={position}>
-      <FloorMascot npcImg={npcImg} floorId={floorId} />
-    </group>
-  );
+function floorY(index: number) {
+  return index * (FLOOR_HEIGHT + FLOOR_GAP) + 0.34;
 }
 
 function FloorBlock({ floor, index, hovered, selected, onHover, onSelect }: {
@@ -60,49 +55,70 @@ function FloorBlock({ floor, index, hovered, selected, onHover, onSelect }: {
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
 }) {
-  const y = index * 0.47 + 0.35;
-  const materialColor = hovered || selected ? floor.color : new THREE.Color(floor.color).lerp(new THREE.Color('#ffffff'), 0.18).getStyle();
+  const y = floorY(index);
+  const active = hovered || selected;
+  const bodyColor = active ? floor.color : softenColor(floor.color);
+  const lift = active ? 0.08 : 0;
 
   return (
-    <group position={[floor.x, y, floor.z]}>
-      <mesh
+    <group position={[0, y + lift, 0]}>
+      <mesh position={[0, -(FLOOR_HEIGHT + FLOOR_GAP) / 2 + 0.01, 0]} receiveShadow>
+        <boxGeometry args={[TOWER_WIDTH + 0.06, FLOOR_GAP, TOWER_DEPTH + 0.06]} />
+        <meshStandardMaterial color="#fffdf9" roughness={0.92} />
+      </mesh>
+
+      <RoundedBox
+        args={[TOWER_WIDTH, FLOOR_HEIGHT, TOWER_DEPTH]}
+        radius={0.08}
+        smoothness={6}
         castShadow
         receiveShadow
         onPointerOver={(e) => { e.stopPropagation(); onHover(floor.id); }}
         onPointerOut={(e) => { e.stopPropagation(); onHover(null); }}
         onClick={(e) => { e.stopPropagation(); onSelect(floor.id); }}
-        scale={hovered ? [1.035, 1.08, 1.035] : [1, 1, 1]}
+        scale={active ? 1.03 : 1}
       >
-        <boxGeometry args={[floor.width, 0.34, floor.depth]} />
-        <meshStandardMaterial color={materialColor} roughness={0.54} metalness={0.02} />
+        <meshStandardMaterial
+          color={bodyColor}
+          roughness={0.38}
+          metalness={0.02}
+          emissive={active ? floor.color : '#000000'}
+          emissiveIntensity={active ? 0.14 : 0}
+        />
+      </RoundedBox>
+
+      <mesh position={[-TOWER_WIDTH / 2 + 0.18, 0.02, TOWER_DEPTH / 2 + 0.015]} castShadow>
+        <boxGeometry args={[0.1, FLOOR_HEIGHT * 0.72, 0.03]} />
+        <meshStandardMaterial color={floor.color} roughness={0.35} />
       </mesh>
 
-      <mesh castShadow receiveShadow position={[0, 0.2, floor.depth / 2 + 0.02]}>
-        <boxGeometry args={[floor.width * 0.92, 0.08, 0.08]} />
-        <meshStandardMaterial color="#fff8ef" roughness={0.42} />
-      </mesh>
-
-      {Array.from({ length: 5 }).map((_, i) => (
-        <mesh key={i} position={[-floor.width / 2 + 0.65 + i * 0.85, 0.04, floor.depth / 2 + 0.055]}>
-          <boxGeometry args={[0.34, 0.18, 0.035]} />
-          <meshStandardMaterial color={hovered ? '#fff1a8' : '#ffe4b2'} emissive={hovered ? '#5c3200' : '#1f1200'} emissiveIntensity={hovered ? 0.18 : 0.04} roughness={0.35} />
+      {active && (
+        <mesh position={[0, 0, TOWER_DEPTH / 2 + 0.04]} rotation={[0, 0, 0]}>
+          <ringGeometry args={[TOWER_WIDTH * 0.22, TOWER_WIDTH * 0.26, 32]} />
+          <meshBasicMaterial color={floor.color} transparent opacity={0.55} />
         </mesh>
-      ))}
+      )}
+    </group>
+  );
+}
 
-      <Text
-        position={[-floor.width / 2 + 0.34, 0.31, floor.depth / 2 + 0.08]}
-        rotation={[-0.08, 0, 0]}
-        fontSize={0.16}
-        color="#ffffff"
-        anchorX="left"
-        anchorY="middle"
-        outlineWidth={0.012}
-        outlineColor="#3b2b20"
-      >
-        {floor.name}
-      </Text>
-
-      <FloorMascotMarker position={[floor.width / 2 - 0.52, 0.25, floor.depth / 2 - 0.38]} npcImg={floor.npcImg} floorId={floor.id} />
+function TowerCrown({ topY }: { topY: number }) {
+  const breed = useMemo(() => breedFromAvatar(deptMascot.management), []);
+  return (
+    <group position={[0, topY, 0]}>
+      <mesh castShadow receiveShadow position={[0, 0.18, 0]}>
+        <cylinderGeometry args={[1.05, 1.2, 0.22, 24]} />
+        <meshStandardMaterial color="#fff8ef" roughness={0.55} />
+      </mesh>
+      <mesh castShadow position={[0, 0.52, 0]}>
+        <sphereGeometry args={[0.72, 24, 18]} />
+        <meshStandardMaterial color="#f5e6c8" roughness={0.48} />
+      </mesh>
+      <Float speed={1.6} rotationIntensity={0.12} floatIntensity={0.35}>
+        <group position={[0, 1.05, 0]} scale={0.62}>
+          <PlushAnimal breed={breed} mood="happy" phase={0.2} />
+        </group>
+      </Float>
     </group>
   );
 }
@@ -114,28 +130,30 @@ function Building3D({ hoveredFloor, selectedFloor, onHover, onSelect }: {
   onSelect: (id: string) => void;
 }) {
   const floorMeshes = useMemo(() => floors, []);
+  const towerTop = floorY(floors.length - 1) + FLOOR_HEIGHT + 0.2;
 
   return (
     <Canvas
       shadows
-      camera={{ position: [5.8, 4.7, 7.4], fov: 39 }}
-      style={{ width: '100%', height: '100%' }}
+      camera={{ position: [5.4, 4.2, 6.8], fov: 36 }}
+      style={{ width: '100%', height: '100%', background: SCENE_BG }}
       gl={{ antialias: true, alpha: false }}
+      onCreated={({ gl }) => {
+        gl.setClearColor(SCENE_BG);
+        gl.domElement.style.background = SCENE_BG;
+      }}
     >
-      <color attach="background" args={["#f7ebdd"]} />
-      <fog attach="fog" args={["#f7ebdd", 10, 22]} />
-      <ambientLight intensity={1.15} />
-      <directionalLight position={[5, 8, 5]} intensity={2.5} castShadow shadow-mapSize={[2048, 2048]} />
-      <directionalLight position={[-4, 4, -5]} intensity={0.8} />
+      <color attach="background" args={[SCENE_BG]} />
+      <fog attach="fog" args={[SCENE_BG, 14, 28]} />
+      <ambientLight intensity={0.95} />
+      <directionalLight position={[6, 10, 4]} intensity={1.8} castShadow shadow-mapSize={[2048, 2048]} />
+      <directionalLight position={[-5, 5, -4]} intensity={0.55} color="#fff4e8" />
+      <pointLight position={[0, 3, 4]} intensity={0.35} color="#ffe8d6" />
 
-      <group position={[0, -2.85, 0]} rotation={[0, -0.42, 0]}>
-        <mesh receiveShadow position={[0, -0.12, 0]}>
-          <cylinderGeometry args={[4.8, 5.2, 0.28, 8]} />
-          <meshStandardMaterial color="#8d7966" roughness={0.9} />
-        </mesh>
-        <mesh receiveShadow position={[0, 0.04, 0]}>
-          <cylinderGeometry args={[4.55, 4.75, 0.22, 8]} />
-          <meshStandardMaterial color="#f3e5d8" roughness={0.85} />
+      <group position={[0, -2.75, 0]} rotation={[0, -0.35, 0]}>
+        <mesh receiveShadow position={[0, -0.08, 0]}>
+          <cylinderGeometry args={[3.2, 3.55, 0.2, 32]} />
+          <meshStandardMaterial color="#efe2d4" roughness={0.95} />
         </mesh>
 
         {floorMeshes.map((floor, index) => (
@@ -150,31 +168,26 @@ function Building3D({ hoveredFloor, selectedFloor, onHover, onSelect }: {
           />
         ))}
 
-        <mesh castShadow receiveShadow position={[0, floors.length * 0.47 + 0.46, 0]}>
-          <coneGeometry args={[3.15, 0.8, 8]} />
-          <meshStandardMaterial color="#cfb07d" roughness={0.74} />
-        </mesh>
-        <mesh castShadow receiveShadow position={[0, floors.length * 0.47 + 0.96, 0]}>
-          <boxGeometry args={[1.65, 0.42, 1.15]} />
-          <meshStandardMaterial color="#fff4df" roughness={0.55} />
-        </mesh>
+        <TowerCrown topY={towerTop} />
       </group>
 
+      <ContactShadows position={[0, -3.02, 0]} opacity={0.28} scale={12} blur={2.4} far={8} color="#6b5d4f" />
+
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.05, 0]}>
-        <circleGeometry args={[7, 64]} />
-        <meshStandardMaterial color="#e8d8c8" roughness={1} />
+        <circleGeometry args={[8, 64]} />
+        <meshStandardMaterial color="#efe4d8" roughness={1} />
       </mesh>
 
       <OrbitControls
         makeDefault
         enablePan={false}
         enableZoom
-        minDistance={5.2}
-        maxDistance={11}
+        minDistance={5.5}
+        maxDistance={10.5}
         autoRotate
-        autoRotateSpeed={0.75}
-        minPolarAngle={Math.PI / 4.2}
-        maxPolarAngle={Math.PI / 2.05}
+        autoRotateSpeed={0.55}
+        minPolarAngle={Math.PI / 4.5}
+        maxPolarAngle={Math.PI / 2.08}
       />
     </Canvas>
   );
@@ -192,7 +205,7 @@ export default function OfficeBuilding() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden pa-bg-lobby">
-      <div className="absolute inset-0 pt-16" style={{ width: '100%', height: 'calc(100vh - 4rem)' }}>
+      <div className="absolute inset-0 pt-16" style={{ width: '100%', height: 'calc(100vh - 4rem)', background: SCENE_BG }}>
         <Building3D
           hoveredFloor={hoveredFloor}
           selectedFloor={selectedFloor}
@@ -250,43 +263,55 @@ export default function OfficeBuilding() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="absolute bottom-6 left-4 right-4 z-50 flex justify-center px-2 sm:px-4"
           >
-            <div className="w-full max-w-xl max-h-[72vh] overflow-y-auto pa-scroll p-4 sm:p-6 pa-panel pa-panel-accent" style={{ borderColor: deptData.color + '44', boxShadow: `var(--pa-shadow-lg), 0 0 0 1px ${deptData.color}18` }}>
-              <div className="flex items-start gap-4">
-                <FluffyAvatar
-                  src={floors.find((f) => f.id === selectedFloor)?.npcImg ?? ''}
-                  size={68}
-                  mood="happy"
-                  borderColor={deptData.color}
-                  showExpression
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xl">{floors.find((f) => f.id === selectedFloor)?.icon}</span>
-                    <p className="text-lg font-extrabold" style={{ color: deptData.color }}>{deptData.name}</p>
-                  </div>
-                  <p className="text-[11px] font-bold mb-1" style={{ color: deptData.color }}>{deptData.tagline}</p>
-                  <p className="text-[10px] leading-relaxed mb-2" style={{ color: '#666' }}>{deptData.mission}</p>
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {deptData.coreOutputs.map((f) => (
-                      <span key={f} className="px-2 py-0.5 text-[9px] font-bold rounded-full" style={{ backgroundColor: deptData.color + '12', color: deptData.color }}>{f}</span>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-0 mb-3">
-                    {floorNpcs.map((npc, i) => (
-                      <div key={npc.id} style={{ marginLeft: i > 0 ? -4 : 0, zIndex: floorNpcs.length - i }} title={`${npc.name} · ${npc.role}`}>
-                        <FluffyAvatar src={npc.avatar} size={40} mood={npc.personality} showExpression borderColor={deptData.color} />
-                      </div>
-                    ))}
-                    <span className="text-[9px] font-bold ml-1" style={{ color: '#888' }}>+{npcs.filter((n) => n.departmentId === selectedFloor).length - floorNpcs.length} 位各职级带路人</span>
+            <div className="w-full max-w-xl max-h-[72vh] flex flex-col pa-panel pa-panel-accent overflow-hidden" style={{ borderColor: deptData.color + '44', boxShadow: `var(--pa-shadow-lg), 0 0 0 1px ${deptData.color}18` }}>
+              <div className="relative shrink-0 p-4 sm:p-6 pb-3">
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setSelectedFloor(null)}
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 pa-icon-btn w-9 h-9 z-10"
+                  aria-label="关闭"
+                >
+                  <X size={16} style={{ color: deptData.color }} />
+                </motion.button>
+                <div className="flex items-start gap-4 pr-8">
+                  <FluffyAvatar
+                    src={floors.find((f) => f.id === selectedFloor)?.npcImg ?? ''}
+                    size={68}
+                    mood="happy"
+                    borderColor={deptData.color}
+                    showExpression
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xl">{floors.find((f) => f.id === selectedFloor)?.icon}</span>
+                      <p className="text-lg font-extrabold" style={{ color: deptData.color }}>{deptData.name}</p>
+                    </div>
+                    <p className="text-[11px] font-bold mb-1" style={{ color: deptData.color }}>{deptData.tagline}</p>
+                    <p className="text-[10px] leading-relaxed mb-2" style={{ color: '#666' }}>{deptData.mission}</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {deptData.coreOutputs.map((f) => (
+                        <span key={f} className="px-2 py-0.5 text-[9px] font-bold rounded-full" style={{ backgroundColor: deptData.color + '12', color: deptData.color }}>{f}</span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-0">
+                      {floorNpcs.map((npc, i) => (
+                        <div key={npc.id} style={{ marginLeft: i > 0 ? -4 : 0, zIndex: floorNpcs.length - i }} title={`${npc.name} · ${npc.role}`}>
+                          <FluffyAvatar src={npc.avatar} size={40} mood={npc.personality} showExpression borderColor={deptData.color} />
+                        </div>
+                      ))}
+                      <span className="text-[9px] font-bold ml-1" style={{ color: '#888' }}>+{npcs.filter((n) => n.departmentId === selectedFloor).length - floorNpcs.length} 位各职级带路人</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-3 pt-3 border-t-2" style={{ borderColor: deptData.color + '33' }}>
+              <div className="flex-1 overflow-y-auto pa-scroll px-4 sm:px-6 pt-3 border-t-2" style={{ borderColor: deptData.color + '33' }}>
                 <CareerLadder tiers={deptData.careerLadder} color={deptData.color} realScenes={deptData.realScenes} voices={deptData.voices} />
               </div>
 
-              <div className="flex flex-col gap-2 mt-4">
+              <div className="shrink-0 flex flex-col gap-2 p-4 sm:p-6 pt-3 border-t-2" style={{ borderColor: deptData.color + '33' }}>
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1.02, y: -2 }}
