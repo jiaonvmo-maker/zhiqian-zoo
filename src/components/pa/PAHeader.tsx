@@ -33,3 +33,4 @@ function PAHeaderComponent({ onBack, title, subtitle, icon, right, dark }: PAHea
 }
 
 export default memo(PAHeaderComponent);
+
