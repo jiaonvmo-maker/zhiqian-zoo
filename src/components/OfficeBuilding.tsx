@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, RoundedBox, ContactShadows, Float } from '@react-three/drei';
+import { OrbitControls, RoundedBox, ContactShadows, Float, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -91,6 +91,28 @@ function FloorBlock({ floor, index, hovered, selected, onHover, onSelect }: {
         <boxGeometry args={[0.1, FLOOR_HEIGHT * 0.72, 0.03]} />
         <meshStandardMaterial color={floor.color} roughness={0.35} />
       </mesh>
+
+      <Html
+        position={[-0.72, 0.03, TOWER_DEPTH / 2 + 0.05]}
+        transform
+        distanceFactor={5.6}
+        style={{ pointerEvents: 'none', userSelect: 'none' }}
+      >
+        <span
+          style={{
+            display: 'inline-block',
+            fontSize: 11,
+            fontWeight: 800,
+            color: '#fffef8',
+            letterSpacing: '0.04em',
+            whiteSpace: 'nowrap',
+            textShadow: '0 1px 0 #4a3f35, 0 2px 6px rgba(45,37,32,0.4)',
+            fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
+          }}
+        >
+          {floor.name}
+        </span>
+      </Html>
 
       {active && (
         <mesh position={[0, 0, TOWER_DEPTH / 2 + 0.04]} rotation={[0, 0, 0]}>
@@ -319,7 +341,7 @@ export default function OfficeBuilding() {
                   onClick={() => setTryWorkDept(selectedFloor)}
                   className="w-full py-3 text-sm pa-btn pa-btn-pink pa-btn-height"
                 >
-                  📱 干一天试试 · 含黑话讲解
+                  🎭 干一天试试 · 含黑话讲解
                 </motion.button>
                 <div className="flex gap-2">
                   <motion.button

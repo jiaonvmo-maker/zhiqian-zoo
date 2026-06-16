@@ -166,7 +166,7 @@ export default function DepartmentChat() {
           className="w-full py-2.5 px-3 text-left pa-panel text-[11px] font-bold"
           style={{ borderColor: dept.color }}
         >
-          📱 零基础？点这里「干一天」—— 带黑话讲解和适岗判断
+          🎭 零基础？点这里「干一天」—— 带黑话讲解和适岗判断
         </button>
       </div>
 

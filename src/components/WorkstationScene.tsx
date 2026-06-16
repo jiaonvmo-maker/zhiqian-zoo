@@ -332,7 +332,7 @@ export default function WorkstationScene() {
           className="px-6 py-3 text-sm pa-btn pa-btn-height"
           style={{ borderColor: dept.color, boxShadow: `0 4px 0 ${dept.color}`, background: `linear-gradient(180deg, ${dept.color}dd, ${dept.color})`, color: '#fff' }}
         >
-          📱 干一天 · 零基础体验
+          🎭 干一天 · 零基础体验
         </motion.button>
         <motion.button
           type="button"
