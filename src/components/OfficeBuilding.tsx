@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, RoundedBox, ContactShadows, Float, Html } from '@react-three/drei';
+import { OrbitControls, RoundedBox, ContactShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -45,6 +45,40 @@ function softenColor(hex: string, amount = 0.32) {
 
 function floorY(index: number) {
   return index * (FLOOR_HEIGHT + FLOOR_GAP) + 0.34;
+}
+
+function createLabelTexture(text: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 320;
+  canvas.height = 80;
+  const ctx = canvas.getContext('2d')!;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = 'bold 36px system-ui, "Microsoft YaHei", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 5;
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(74, 63, 53, 0.85)';
+  ctx.strokeText(text, 12, canvas.height / 2);
+  ctx.fillStyle = '#fffef8';
+  ctx.fillText(text, 12, canvas.height / 2);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  return texture;
+}
+
+function FloorLabel({ text }: { text: string }) {
+  const texture = useMemo(() => createLabelTexture(text), [text]);
+
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  return (
+    <mesh position={[-0.68, 0.03, TOWER_DEPTH / 2 + 0.04]} renderOrder={2}>
+      <planeGeometry args={[1.35, 0.34]} />
+      <meshBasicMaterial map={texture} transparent depthWrite={false} toneMapped={false} />
+    </mesh>
+  );
 }
 
 function FloorBlock({ floor, index, hovered, selected, onHover, onSelect }: {
@@ -92,27 +126,7 @@ function FloorBlock({ floor, index, hovered, selected, onHover, onSelect }: {
         <meshStandardMaterial color={floor.color} roughness={0.35} />
       </mesh>
 
-      <Html
-        position={[-0.72, 0.03, TOWER_DEPTH / 2 + 0.05]}
-        transform
-        distanceFactor={5.6}
-        style={{ pointerEvents: 'none', userSelect: 'none' }}
-      >
-        <span
-          style={{
-            display: 'inline-block',
-            fontSize: 11,
-            fontWeight: 800,
-            color: '#fffef8',
-            letterSpacing: '0.04em',
-            whiteSpace: 'nowrap',
-            textShadow: '0 1px 0 #4a3f35, 0 2px 6px rgba(45,37,32,0.4)',
-            fontFamily: 'Fredoka, Nunito, system-ui, sans-serif',
-          }}
-        >
-          {floor.name}
-        </span>
-      </Html>
+      <FloorLabel text={floor.name} />
 
       {active && (
         <mesh position={[0, 0, TOWER_DEPTH / 2 + 0.04]} rotation={[0, 0, 0]}>
