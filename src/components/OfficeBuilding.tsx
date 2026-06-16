@@ -220,8 +220,6 @@ function Building3D({ hoveredFloor, selectedFloor, onHover, onSelect }: {
         enableZoom
         minDistance={5.5}
         maxDistance={10.5}
-        autoRotate
-        autoRotateSpeed={0.55}
         minPolarAngle={Math.PI / 4.5}
         maxPolarAngle={Math.PI / 2.08}
       />
