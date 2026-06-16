@@ -97,7 +97,7 @@ export default function EntryGame() {
               transition={{ delay: 0.2 + i * 0.1, type: 'spring', damping: 18, stiffness: 200 }}
               whileHover={{ y: -6, scale: 1.08 }}
             >
-              <FluffyAvatar src={item.src} size={64} mood="happy" showExpression borderColor="var(--pa-gold)" />
+              <FluffyAvatar src={item.src} size={72} mood="happy" showExpression variant="legs" borderColor="var(--pa-gold)" />
               <span className="pa-label text-[10px]">{item.label}</span>
             </motion.div>
           ))}

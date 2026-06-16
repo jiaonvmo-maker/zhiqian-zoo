@@ -10,6 +10,7 @@ interface FluffyAvatarProps {
   onClick?: () => void;
   className?: string;
   showExpression?: boolean;
+  variant?: 'avatar' | 'legs';
 }
 
 /** 全站统一 3D 毛绒头像 — 猛兽派对风会动角色 */
@@ -21,6 +22,7 @@ export default function FluffyAvatar({
   onClick,
   className = '',
   showExpression = true,
+  variant = 'avatar',
 }: FluffyAvatarProps) {
   const plushMood = showExpression ? mood : 'chill';
 
@@ -33,6 +35,7 @@ export default function FluffyAvatar({
       onClick={onClick}
       className={className}
       animate
+      variant={variant}
     />
   );
 }
