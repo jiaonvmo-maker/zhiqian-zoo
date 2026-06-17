@@ -17,6 +17,10 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Claude / Cursor local settings (may contain API keys)
+.claude/settings.local.json
+!.claude/settings.local.json.example
+
 # Test results
 test-results/
 playwright-report/
