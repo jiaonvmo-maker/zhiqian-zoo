@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -53,6 +57,7 @@
     "react": "^19.2.0",
     "react-day-picker": "^9.13.0",
     "react-dom": "^19.2.0",
+    "react-error-boundary": "^6.1.2",
     "react-hook-form": "^7.70.0",
     "react-resizable-panels": "^4.2.2",
     "react-router": "^7.6.1",

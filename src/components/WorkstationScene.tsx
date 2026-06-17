@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { departments } from '@/data/departments';
@@ -9,29 +9,16 @@ import FluffyAvatar from './FluffyAvatar';
 import PAHeader from '@/components/pa/PAHeader';
 import CareerLadder, { TierBadge } from '@/components/CareerLadder';
 import WorkMomentModal from '@/components/WorkMomentModal';
+import Workstation3D from '@/components/Workstation3D';
 import { getWorkMoment } from '@/data/workMoments';
 
 const TIER_ORDER = { intern: 0, associate: 1, senior: 2, director: 3, executive: 4 } as const;
-const deskPositions = [
-  { top: 32, left: 22 }, { top: 32, left: 28 }, { top: 32, left: 34 },
-  { top: 45, left: 20 }, { top: 45, left: 26 }, { top: 45, left: 32 },
-  { top: 58, left: 18 }, { top: 58, left: 24 }, { top: 58, left: 30 },
-  { top: 70, left: 16 }, { top: 70, left: 22 }, { top: 70, left: 28 },
-  { top: 40, left: 55 }, { top: 40, left: 62 }, { top: 40, left: 69 },
-  { top: 55, left: 58 }, { top: 55, left: 65 }, { top: 55, left: 72 },
-  { top: 68, left: 55 }, { top: 68, left: 62 },
-];
 
 export default function WorkstationScene() {
   const { selectedDept, selectDepartment, setPhase, showBadge } = useGameStore();
   const [selectedNPC, setSelectedNPC] = useState<string | null>(null);
   const [hoveredNPC, setHoveredNPC] = useState<string | null>(null);
-  const [scale, setScale] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
   const [tryWork, setTryWork] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dragStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
   const dept = departments.find((d) => d.id === selectedDept);
   if (!dept) {
@@ -51,196 +38,32 @@ export default function WorkstationScene() {
   const deptNpcs = npcs
     .filter((n) => n.departmentId === dept.id)
     .sort((a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier]);
-  // Map NPCs to desk positions (cycle through if more NPCs than desks)
-  const npcsWithPos = deptNpcs.map((npc, i) => ({
-    ...npc,
-    pos: deskPositions[i % deskPositions.length],
-    offsetY: Math.sin(i * 1.5) * 3, // slight bob offset for animation
-  }));
-
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    setScale((s) => Math.max(0.5, Math.min(2.5, s + e.deltaY * -0.001)));
-  }, []);
-
-  const onPointerDown = useCallback((e: React.PointerEvent) => {
-    setIsDragging(true);
-    dragStart.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
-  }, [pan]);
-
-  const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging) return;
-    setPan({
-      x: dragStart.current.panX + (e.clientX - dragStart.current.x),
-      y: dragStart.current.panY + (e.clientY - dragStart.current.y),
-    });
-  }, [isDragging]);
-
-  const onPointerUp = useCallback(() => setIsDragging(false), []);
-
-  // Touch pinch zoom
-  const touchDist = useRef(0);
-  const touchScale = useRef(1);
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        touchDist.current = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        touchScale.current = scale;
-      }
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        e.preventDefault();
-        const d = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        setScale(Math.max(0.5, Math.min(2.5, touchScale.current * (d / touchDist.current))));
-      }
-    };
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    return () => { el.removeEventListener('touchstart', onTouchStart); el.removeEventListener('touchmove', onTouchMove); };
-  }, [scale]);
 
   const hoveredNpcData = npcs.find((n) => n.id === hoveredNPC);
 
   return (
     <div className="relative w-full h-screen overflow-hidden pa-bg-lobby">
-      {/* Office floor plan - draggable & zoomable */}
-      <div
-        ref={containerRef}
-        className="absolute inset-0 cursor-grab active:cursor-grabbing"
-        style={{ touchAction: 'none' }}
-        onWheel={handleWheel}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
-      >
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{
-            transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
-            transformOrigin: 'center center',
-            transition: isDragging ? 'none' : 'transform 0.15s ease-out',
-          }}
-        >
-          <div className="relative" style={{ width: 'min(95vw, 1400px)', height: 'min(90vh, 800px)' }}>
-            <img
-              src="/images/office-floor-plan.jpg"
-              alt="Office Floor Plan"
-              className="w-full h-full object-contain rounded-lg"
-              style={{ filter: hoveredNPC ? 'brightness(0.85)' : 'brightness(0.95)' }}
-              draggable={false}
-            />
-
-            {/* Party Animals NPCs on their desks */}
-            {npcsWithPos.map((npc, i) => {
-              const isHovered = hoveredNPC === npc.id;
-              return (
-                <motion.button
-                  key={npc.id}
-                  className="absolute"
-                  style={{
-                    top: `${npc.pos.top + npc.offsetY * 0.3}%`,
-                    left: `${npc.pos.left}%`,
-                    width: '7%',
-                    height: '10%',
-                    zIndex: isHovered ? 30 : 20 - i,
-                  }}
-                  onMouseEnter={() => setHoveredNPC(npc.id)}
-                  onMouseLeave={() => setHoveredNPC(null)}
-                  onClick={() => setSelectedNPC(npc.id)}
-                  animate={{
-                    y: [0, -4, 0],
-                    transition: { duration: 2 + i * 0.3, repeat: Infinity, ease: 'easeInOut' },
-                  }}
-                  whileHover={{ scale: 1.2, y: -8 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  {/* Shadow */}
-                  <div
-                    className="absolute rounded-full"
-                    style={{
-                      bottom: '-5%', left: '15%', width: '70%', height: '20%',
-                      backgroundColor: 'rgba(0,0,0,0.15)',
-                      filter: 'blur(3px)',
-                      transform: isHovered ? 'scale(0.8)' : 'scale(1)',
-                      transition: 'transform 0.2s',
-                    }}
-                  />
-
-                  {/* Character image */}
-                  <img
-                    src={npc.avatar}
-                    alt={npc.name}
-                    className="w-full h-full object-contain"
-                    style={{
-                      filter: isHovered
-                        ? `drop-shadow(0 6px 12px ${dept.color}80)`
-                        : `drop-shadow(0 3px 6px rgba(0,0,0,0.25))`,
-                      transition: 'filter 0.2s',
-                    }}
-                    draggable={false}
-                  />
-
-                  {/* Name tag on hover */}
-                  {isHovered && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 5, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg whitespace-nowrap"
-                      style={{
-                        backgroundColor: dept.color,
-                        boxShadow: `0 4px 16px ${dept.color}60`,
-                      }}
-                    >
-                      <p className="text-white font-extrabold text-[10px]">{npc.name}</p>
-                    </motion.div>
-                  )}
-
-                  {/* Glow ring on hover */}
-                  {isHovered && (
-                    <div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        border: `3px solid ${dept.color}`,
-                        boxShadow: `0 0 20px ${dept.color}50, inset 0 0 10px ${dept.color}20`,
-                        animation: 'pulse 1s infinite',
-                      }}
-                    />
-                  )}
-                </motion.button>
-              );
-            })}
-          </div>
-        </div>
+      <div className="absolute inset-0 pt-16" style={{ height: 'calc(100vh - 4rem)' }}>
+        <Workstation3D
+          npcs={deptNpcs}
+          deptColor={dept.color}
+          hoveredNPC={hoveredNPC}
+          onHover={setHoveredNPC}
+          onSelect={setSelectedNPC}
+        />
       </div>
 
       <PAHeader
         onBack={() => setPhase('sandbox')}
         icon={<FluffyAvatar src={deptNpcs[0]?.avatar || ''} size={36} mood="normal" borderColor={dept.color} showExpression={false} />}
         title={`${dept.name}工位`}
-        subtitle={`${deptNpcs.length} 位各职级前辈 · 私聊了解真实日常`}
+        subtitle="1:1 立体办公室 · 拖拽旋转 · 点击深聊"
         right={
-          <>
-            <button type="button" onClick={() => { setScale(1); setPan({ x: 0, y: 0 }); }} className="pa-btn pa-btn-cream text-xs px-3 py-1.5 h-auto min-h-0">⟲</button>
-            <button type="button" onClick={() => selectDepartment(dept.id)} className="pa-btn pa-btn-pink text-xs px-4 py-1.5 h-auto min-h-0">💬 群聊</button>
-          </>
+          <button type="button" onClick={() => selectDepartment(dept.id)} className="pa-btn pa-btn-pink text-xs px-4 py-1.5 h-auto min-h-0">
+            💬 群聊
+          </button>
         }
       />
-
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2">
-        <motion.button type="button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setScale((s) => Math.min(2.5, s + 0.2))} className="pa-icon-btn w-11 h-11 text-lg font-bold pa-title">+</motion.button>
-        <div className="pa-tag w-11 text-center text-[10px] py-1">{Math.round(scale * 100)}%</div>
-        <motion.button type="button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setScale((s) => Math.max(0.5, s - 0.2))} className="pa-icon-btn w-11 h-11 text-lg font-bold pa-title">−</motion.button>
-      </div>
 
       {/* Left side - NPC list */}
       <div className="absolute left-4 top-20 z-30 flex flex-col gap-1.5 max-h-[60vh] overflow-y-auto pr-1 scrollbar-hide">

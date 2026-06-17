@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { WorkMoment } from '@/data/workMomentTypes';
@@ -36,13 +36,22 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
   const totalSteps = moment.steps.length;
   const currentStep = moment.steps[stepIdx];
 
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+  }, []);
+
   const pushPings = useCallback((idx: number) => {
     const step = moment.steps[idx];
     if (!step) return;
     setReflection(null);
     setLog((prev) => [...prev, ...step.pings.map((p) => ({ from: p.from, text: p.text }))]);
     setWaitingChoice(true);
-  }, [moment.steps]);
+    scrollToBottom();
+  }, [moment.steps, scrollToBottom]);
 
   const completeReflection = useCallback(() => {
     if (!reflection) return;
@@ -76,17 +85,20 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
       ...(choice.reply ? [{ from: choice.reply.from, text: choice.reply.text }] : []),
     ]);
 
+    scrollToBottom();
+
     const nextIdx = choice.next ?? stepIdx + 1;
     const hasNext = nextIdx < moment.steps.length && moment.steps[nextIdx];
 
     setTimeout(() => {
+      scrollToBottom();
       setReflection({
         thought: choice.thought,
         teach: choice.teach ?? null,
         nextIdx,
         hasNext: Boolean(hasNext),
       });
-    }, 480);
+    }, 1100);
   };
 
   const endTag = screen === 'ended'
@@ -214,6 +226,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
                   </motion.div>
                 ))}
 
+                <div ref={chatEndRef} className="h-1" />
               </motion.div>
             )}
 

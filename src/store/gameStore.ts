@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AppPhase, UserProfile, MetaIdea, Notification, ChatMessage } from '@/types';
+import type { AppPhase, UserProfile, MetaIdea, Notification, ChatMessage, Department } from '@/types';
 import { initialMetaIdeas } from '@/data/surveyData';
 import { deptMascot } from '@/data/partyAnimalsAssets';
 
@@ -15,7 +15,7 @@ interface GameState {
   globalTime: string;
   showBadge: boolean;
   showNotifications: boolean;
-  departmentMessages: Record<string, ChatMessage[]>;
+  departmentMessages: Record<Department['id'], ChatMessage[]>;
   // Actions
   setPhase: (phase: AppPhase) => void;
   selectDepartment: (id: string | null) => void;

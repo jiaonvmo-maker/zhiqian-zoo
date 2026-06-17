@@ -1,12 +1,17 @@
+import { Suspense, lazy } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useGameStore } from '@/store/gameStore';
 import EntryGame from '@/components/EntryGame';
 import QuickSurvey from '@/components/QuickSurvey';
-import OfficeBuilding from '@/components/OfficeBuilding';
-import WorkstationScene from '@/components/WorkstationScene';
 import DepartmentChat from '@/components/DepartmentChat';
 import MetaBoard from '@/components/MetaBoard';
 import NotificationSystem from '@/components/NotificationSystem';
+import { LoadingScreen, ErrorFallback } from '@/components/LoadingScreen';
 import { AnimatePresence, motion } from 'framer-motion';
+
+// Lazy load 3D components for better performance
+const OfficeBuilding = lazy(() => import('@/components/OfficeBuilding'));
+const WorkstationScene = lazy(() => import('@/components/WorkstationScene'));
 
 export default function App() {
   const phase = useGameStore((s) => s.phase);
@@ -47,7 +52,11 @@ export default function App() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="w-full h-screen"
           >
-            <OfficeBuilding />
+            <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => window.location.reload()}>
+              <Suspense fallback={<LoadingScreen />}>
+                <OfficeBuilding />
+              </Suspense>
+            </ErrorBoundary>
           </motion.div>
         )}
 
@@ -59,7 +68,11 @@ export default function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <WorkstationScene />
+            <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => window.location.reload()}>
+              <Suspense fallback={<LoadingScreen />}>
+                <WorkstationScene />
+              </Suspense>
+            </ErrorBoundary>
           </motion.div>
         )}
 

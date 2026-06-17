@@ -9,9 +9,9 @@ import { defaultAvatar } from '@/data/partyAnimalsAssets';
 const CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`'.split('');
 
 const QUESTION_VIBES = [
-  { stamp: '测', line: '别装了，你根本没作息' },
-  { stamp: '啊这', line: '大脑开机检查中……' },
-  { stamp: '怼', line: '最后一问，憋不住了？' },
+  { stamp: '测', line: '别装了，你根本没作息', tilt: -12 },
+  { stamp: '啊这', line: '大脑开机检查中……', tilt: -8 },
+  { stamp: '怼', line: '最后一问，憋不住了？', tilt: -14 },
 ] as const;
 
 function scrambleText(text: string, duration: number, onDone: (t: string) => void) {
@@ -156,18 +156,18 @@ export default function QuickSurvey() {
             <div className="pa-panel pa-panel-accent p-6 sm:p-8 mb-6 text-center relative overflow-hidden">
               <motion.span
                 key={`${currentQ}-stamp`}
-                initial={{ scale: 0, rotate: -24 }}
-                animate={{ scale: 1, rotate: [-10, -6, -12, -8] }}
+                initial={{ scale: 0, rotate: QUESTION_VIBES[currentQ].tilt - 18, y: -8 }}
+                animate={{
+                  scale: 1,
+                  rotate: [QUESTION_VIBES[currentQ].tilt, QUESTION_VIBES[currentQ].tilt + 3, QUESTION_VIBES[currentQ].tilt - 2, QUESTION_VIBES[currentQ].tilt],
+                  y: [0, -2, 0],
+                }}
                 transition={{
-                  scale: { type: 'spring', stiffness: 480, damping: 14 },
-                  rotate: { repeat: Infinity, duration: 2.4, ease: 'easeInOut' },
+                  scale: { type: 'spring', stiffness: 520, damping: 13 },
+                  rotate: { repeat: Infinity, duration: 2.8, ease: 'easeInOut' },
+                  y: { repeat: Infinity, duration: 2.8, ease: 'easeInOut' },
                 }}
-                className="absolute top-3 right-3 px-2 py-0.5 text-[10px] font-extrabold rounded-md"
-                style={{
-                  background: 'var(--pa-orange)',
-                  color: '#fff',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
-                }}
+                className="pa-stamp absolute top-3 right-3"
               >
                 {QUESTION_VIBES[currentQ].stamp}
               </motion.span>

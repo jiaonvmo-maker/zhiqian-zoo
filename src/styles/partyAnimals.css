@@ -211,6 +211,42 @@
   color: var(--pa-pink-dark);
 }
 
+/* ===== 手戳印章 — 发癫 vibe 角标 ===== */
+.pa-stamp {
+  display: inline-block;
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  padding: 0.18rem 0.55rem;
+  border: 2px dashed var(--pa-orange);
+  border-radius: 4px 10px 5px 8px;
+  color: var(--pa-orange-dark);
+  background: linear-gradient(145deg, #fff9f2 0%, #ffe8d6 100%);
+  box-shadow:
+    0 2px 0 rgba(196, 98, 62, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transform-origin: center center;
+}
+
+.pa-stamp-pink {
+  border-color: var(--pa-pink);
+  color: var(--pa-pink-dark);
+  background: linear-gradient(145deg, #fff8fa 0%, #fce4ec 100%);
+  box-shadow:
+    0 2px 0 rgba(169, 93, 106, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.pa-stamp-gold {
+  border-color: var(--pa-gold-dark);
+  color: var(--pa-gold-dark);
+  background: linear-gradient(145deg, #fffef8 0%, #fff0c8 100%);
+  box-shadow:
+    0 2px 0 rgba(184, 145, 58, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
 /* ===== 聊天气泡 — 温和不对称的圆角 ===== */
 .pa-bubble-user {
   background: linear-gradient(135deg, var(--pa-orange) 0%, var(--pa-pink) 100%);

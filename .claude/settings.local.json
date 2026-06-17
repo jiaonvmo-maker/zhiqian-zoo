@@ -1,4 +1,9 @@
 {
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://openai-proxy.miracleplus.com",
+    "ANTHROPIC_API_KEY": "sk-aw9vpqMP0BDZ1ZvItEIR7EPVtQkzoaFeZjFVgGATlQEi01Sr",
+    "ANTHROPIC_MODEL": "Opus[1M]"
+  },
   "permissions": {
     "allow": [
       "Bash(npm run *)",
@@ -25,7 +30,10 @@
       "Bash(curl -s http://localhost:5173)",
       "Bash(curl -s http://localhost:5174)",
       "Bash(npx tsc *)",
-      "Bash(curl -s http://localhost:51752)"
+      "Bash(curl -s http://localhost:51752)",
+      "Bash(unset ANTHROPIC_API_KEY)",
+      "Bash(npm audit *)",
+      "Bash(git add *)"
     ]
   }
 }
