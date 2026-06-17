@@ -3,16 +3,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { departments } from '@/data/departments';
 import { npcs } from '@/data/npcs';
+import { getPartyAvatar } from '@/data/partyAnimalsAssets';
 import PrivateChat from './PrivateChat';
 import CyberBadge from './CyberBadge';
-import FluffyAvatar from './FluffyAvatar';
 import PAHeader from '@/components/pa/PAHeader';
 import CareerLadder, { TierBadge } from '@/components/CareerLadder';
 import WorkMomentModal from '@/components/WorkMomentModal';
-import Workstation3D from '@/components/Workstation3D';
 import { getWorkMoment } from '@/data/workMoments';
+import Workstation3D from '@/components/Workstation3D';
 
 const TIER_ORDER = { intern: 0, associate: 1, senior: 2, director: 3, executive: 4 } as const;
+const SCENE_BG = '#e8e4df';
+
+function NpcThumb({ npcId, deptId, size, borderColor }: { npcId: string; deptId: string; size: number; borderColor: string }) {
+  const src = getPartyAvatar(npcId, deptId);
+  return (
+    <div
+      className="shrink-0 rounded-full overflow-hidden"
+      style={{ width: size, height: size, border: `2px solid ${borderColor}`, background: '#fff9f2' }}
+    >
+      <img src={src} alt="" className="w-full h-full object-cover object-center" draggable={false} />
+    </div>
+  );
+}
 
 export default function WorkstationScene() {
   const { selectedDept, selectDepartment, setPhase, showBadge } = useGameStore();
@@ -43,7 +56,7 @@ export default function WorkstationScene() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden pa-bg-lobby">
-      <div className="absolute inset-0 pt-16" style={{ height: 'calc(100vh - 4rem)' }}>
+      <div className="absolute inset-0 pt-16" style={{ height: 'calc(100vh - 4rem)', background: SCENE_BG }}>
         <Workstation3D
           npcs={deptNpcs}
           deptColor={dept.color}
@@ -55,7 +68,7 @@ export default function WorkstationScene() {
 
       <PAHeader
         onBack={() => setPhase('sandbox')}
-        icon={<FluffyAvatar src={deptNpcs[0]?.avatar || ''} size={36} mood="normal" borderColor={dept.color} showExpression={false} />}
+        icon={<NpcThumb npcId={deptNpcs[0]?.id ?? ''} deptId={dept.id} size={36} borderColor={dept.color} />}
         title={`${dept.name}工位`}
         subtitle="1:1 立体办公室 · 拖拽旋转 · 点击深聊"
         right={
@@ -65,39 +78,31 @@ export default function WorkstationScene() {
         }
       />
 
-      {/* Left side - NPC list */}
       <div className="absolute left-4 top-20 z-30 flex flex-col gap-1.5 max-h-[60vh] overflow-y-auto pr-1 scrollbar-hide">
         <p className="text-[10px] font-extrabold mb-1 px-1" style={{ color: dept.color }}>🐾 职级带路人</p>
-        {deptNpcs.map((npc, i) => (
-          <motion.button
+        {deptNpcs.map((npc) => (
+          <button
             key={npc.id}
+            type="button"
             onClick={() => setSelectedNPC(npc.id)}
-            className={`flex items-center gap-2 text-left transition-all ${hoveredNPC === npc.id ? 'pa-panel-accent' : 'pa-panel'}`}
+            className={`flex items-center gap-2 text-left transition-colors ${hoveredNPC === npc.id ? 'pa-panel-accent' : 'pa-panel'}`}
             style={{
               borderColor: hoveredNPC === npc.id ? dept.color : 'var(--pa-brown-light)',
               padding: '6px 10px',
             }}
             onMouseEnter={() => setHoveredNPC(npc.id)}
             onMouseLeave={() => setHoveredNPC(null)}
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.05 }}
-            whileHover={{ scale: 1.05, x: 4 }}
-            whileTap={{ scale: 0.98 }}
           >
-            <FluffyAvatar src={npc.avatar} size={32} mood={npc.personality} borderColor={dept.color} showExpression={false} />
+            <NpcThumb npcId={npc.id} deptId={dept.id} size={32} borderColor={dept.color} />
             <div className="min-w-0">
-              <div className="flex items-center gap-1">
-                <p className="text-[11px] font-extrabold truncate" style={{ color: '#333' }}>{npc.name}</p>
-              </div>
+              <p className="text-[11px] font-extrabold truncate" style={{ color: '#333' }}>{npc.name}</p>
               <p className="text-[9px] font-bold truncate" style={{ color: '#888' }}>{npc.role}</p>
               <TierBadge label={npc.tierLabel} color={dept.color} />
             </div>
-          </motion.button>
+          </button>
         ))}
       </div>
 
-      {/* Right info panel */}
       <div className="absolute top-20 right-4 sm:right-16 z-30 w-48 sm:w-56 max-h-[65vh] overflow-y-auto p-3 pa-panel scrollbar-hide" style={{ borderColor: dept.color, boxShadow: `0 6px 0 ${dept.color}66` }}>
         <p className="text-sm font-extrabold mb-0.5" style={{ color: dept.color }}>{dept.name}</p>
         <p className="text-[10px] font-bold mb-1" style={{ color: dept.color }}>{dept.tagline}</p>
@@ -116,18 +121,18 @@ export default function WorkstationScene() {
         <CareerLadder tiers={dept.careerLadder} color={dept.color} compact realScenes={dept.realScenes} voices={dept.voices} />
       </div>
 
-      {/* NPC hover tooltip */}
       <AnimatePresence>
         {hoveredNpcData && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.15 }}
             className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 px-5 py-3 rounded-2xl pa-panel pa-panel-accent"
             style={{ borderColor: dept.color, boxShadow: `0 6px 0 ${dept.color}88` }}
           >
             <div className="flex items-center gap-3">
-              <FluffyAvatar src={hoveredNpcData.avatar} size={56} mood={hoveredNpcData.personality} showExpression borderColor={dept.color} />
+              <NpcThumb npcId={hoveredNpcData.id} deptId={dept.id} size={56} borderColor={dept.color} />
               <div>
                 <p className="text-sm font-extrabold" style={{ color: dept.color }}>{hoveredNpcData.name}</p>
                 <div className="flex items-center gap-1 mt-0.5">
@@ -142,7 +147,6 @@ export default function WorkstationScene() {
         )}
       </AnimatePresence>
 
-      {/* Bottom actions */}
       <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-3 z-30 flex-wrap px-4">
         <motion.button type="button" whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.94 }} onClick={() => setPhase('sandbox')} className="px-6 py-3 text-sm pa-btn pa-btn-cream pa-btn-height">
           ← 回大厦

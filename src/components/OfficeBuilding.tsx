@@ -237,6 +237,10 @@ export default function OfficeBuilding() {
   const deptData = selectedFloor ? departments.find((d) => d.id === selectedFloor) : null;
   const floorNpcs = selectedFloor ? npcs.filter((n) => n.departmentId === selectedFloor).slice(0, 4) : [];
 
+  useEffect(() => {
+    if (selectedFloor) void import('@/components/WorkstationScene');
+  }, [selectedFloor]);
+
   return (
     <div className="relative w-full h-screen overflow-hidden pa-bg-lobby">
       <div className="absolute inset-0 pt-16" style={{ width: '100%', height: 'calc(100vh - 4rem)', background: SCENE_BG }}>
@@ -360,6 +364,7 @@ export default function OfficeBuilding() {
                     type="button"
                     whileHover={{ scale: 1.03, y: -2 }}
                     whileTap={{ scale: 0.96 }}
+                    onMouseEnter={() => { import('@/components/WorkstationScene'); }}
                     onClick={() => { enterWorkstation(selectedFloor); setSelectedFloor(null); }}
                     className="flex-1 py-3 text-sm pa-btn pa-btn-dept"
                     style={{ background: `linear-gradient(180deg, ${deptData.color}ee, ${deptData.color})` }}

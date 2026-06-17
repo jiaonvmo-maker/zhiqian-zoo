@@ -1,5 +1,9 @@
 import { motion } from 'framer-motion';
 
+export function SceneShell({ background = '#e8e4df' }: { background?: string }) {
+  return <div className="w-full h-screen" style={{ background }} aria-hidden />;
+}
+
 export function LoadingScreen() {
   return (
     <div className="w-full h-screen flex items-center justify-center pa-bg-lobby">

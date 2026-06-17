@@ -1,7 +1,6 @@
-import { Suspense, useMemo, useEffect } from 'react';
+import { Suspense, useMemo, memo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, RoundedBox, useTexture, ContactShadows } from '@react-three/drei';
-import * as THREE from 'three';
+import { OrbitControls, RoundedBox } from '@react-three/drei';
 import type { NPC } from '@/types';
 import PlushAnimal from '@/components/pa3d/PlushAnimal';
 import { breedFromAvatar, moodFromPersonality } from '@/components/pa3d/breeds';
@@ -27,7 +26,7 @@ function WallSegment({ x1, z1, x2, z2 }: { x1: number; z1: number; x2: number; z
   const len = Math.hypot(dx, dz);
   const angle = Math.atan2(dz, dx);
   return (
-    <mesh position={[(x1 + x2) / 2, OFFICE.wallH / 2, (z1 + z2) / 2]} rotation={[0, -angle, 0]} castShadow receiveShadow>
+    <mesh position={[(x1 + x2) / 2, OFFICE.wallH / 2, (z1 + z2) / 2]} rotation={[0, -angle, 0]}>
       <boxGeometry args={[len, OFFICE.wallH, OFFICE.wallT]} />
       <meshStandardMaterial color={WALL} roughness={0.88} />
     </mesh>
@@ -96,26 +95,16 @@ function StraightDesk({ rot = 0 }: { rot?: number }) {
 }
 
 function CurvedPod({ rot = 0 }: { rot?: number }) {
-  const offsets: { x: number; z: number; r: number }[] = [
-    { x: 0, z: -0.35, r: 0 },
-    { x: 0.55, z: 0, r: Math.PI / 2 },
-    { x: -0.55, z: 0, r: -Math.PI / 2 },
-    { x: 0, z: 0.35, r: Math.PI },
-  ];
-
   return (
     <group rotation={[0, rot, 0]}>
-      <mesh position={[0, 0.48, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.72, 0.72, 0.06, 24, 1, false, 0, Math.PI]} />
+      <mesh position={[0, 0.48, 0]}>
+        <cylinderGeometry args={[0.72, 0.72, 0.06, 16, 1, false, 0, Math.PI]} />
         <meshStandardMaterial color={WOOD} roughness={0.58} />
       </mesh>
-      {offsets.map(({ x, z, r }, i) => (
-        <group key={i} position={[x, 0, z]} rotation={[0, r, 0]}>
-          <group position={[0, 0, -0.22]}>
-            <StraightDesk />
-          </group>
-        </group>
-      ))}
+      <mesh position={[0, 0.52, -0.22]}>
+        <boxGeometry args={[0.42, 0.28, 0.03]} />
+        <meshStandardMaterial color="#1e1e1e" roughness={0.35} />
+      </mesh>
     </group>
   );
 }
@@ -285,30 +274,13 @@ function FurniturePiece({ kind, rot = 0 }: { kind: FurnitureKind; rot?: number }
 }
 
 function FloorPlan() {
-  const floorTex = useTexture('/images/office-floor-plan.jpg');
-  floorTex.colorSpace = THREE.SRGBColorSpace;
-  floorTex.anisotropy = 8;
-
-  // Clean up texture on unmount
-  useEffect(() => {
-    return () => {
-      floorTex.dispose();
-    };
-  }, [floorTex]);
-
   return (
     <group>
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <planeGeometry args={[OFFICE.w, OFFICE.d]} />
         <meshStandardMaterial color={CARPET} roughness={0.95} />
       </mesh>
-
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-        <planeGeometry args={[OFFICE.w, OFFICE.d]} />
-        <meshStandardMaterial map={floorTex} transparent opacity={0.22} roughness={1} depthWrite={false} />
-      </mesh>
-
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[4.5, 0.01, -5.5]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[4.5, 0.01, -5.5]}>
         <planeGeometry args={[7, 5]} />
         <meshStandardMaterial color={CARPET_LIGHT} roughness={0.85} />
       </mesh>
@@ -339,7 +311,7 @@ function OfficeShell() {
   );
 }
 
-function DeskNPC({
+function DeskNPCInner({
   npc,
   slot,
   deptColor,
@@ -355,7 +327,10 @@ function DeskNPC({
   onClick: (id: string) => void;
 }) {
   const breed = useMemo(() => breedFromAvatar(npc.avatar), [npc.avatar]);
-  const mood = useMemo(() => moodFromPersonality(npc.personality), [npc.personality]);
+  const mood = useMemo(
+    () => (isHovered ? moodFromPersonality(npc.personality) : 'chill'),
+    [isHovered, npc.personality],
+  );
   const phase = useMemo(() => npc.id.charCodeAt(0) * 0.13, [npc.id]);
 
   return (
@@ -383,6 +358,8 @@ function DeskNPC({
   );
 }
 
+const DeskNPC = memo(DeskNPCInner);
+
 function Scene({
   npcs,
   deptColor,
@@ -400,10 +377,9 @@ function Scene({
     <>
       <color attach="background" args={[SCENE_BG]} />
       <fog attach="fog" args={[SCENE_BG, 18, 32]} />
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[8, 14, 6]} intensity={1.55} castShadow shadow-mapSize={[2048, 2048]} />
-      <directionalLight position={[-6, 8, -4]} intensity={0.4} color="#fff4e8" />
-      <hemisphereLight args={['#fff8f0', '#9a9a9a', 0.35]} />
+      <ambientLight intensity={1.05} />
+      <directionalLight position={[8, 14, 6]} intensity={1.25} />
+      <directionalLight position={[-6, 8, -4]} intensity={0.35} color="#fff4e8" />
 
       <FloorPlan />
       <OfficeShell />
@@ -419,8 +395,6 @@ function Scene({
           onClick={onSelect}
         />
       ))}
-
-      <ContactShadows position={[0, 0.01, 0]} opacity={0.32} scale={28} blur={2.4} far={8} color="#4a4038" />
 
       <OrbitControls
         makeDefault
@@ -451,13 +425,15 @@ export default function Workstation3D({
 }) {
   return (
     <Canvas
-      shadows
       camera={{ position: [-14, 11, 14], fov: 32 }}
+      dpr={[1, 1.25]}
+      frameloop="demand"
       style={{ width: '100%', height: '100%', background: SCENE_BG }}
-      gl={{ antialias: true, alpha: false }}
-      onCreated={({ gl }) => {
+      gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+      onCreated={({ gl, invalidate }) => {
         gl.setClearColor(SCENE_BG);
         gl.domElement.style.background = SCENE_BG;
+        invalidate();
       }}
     >
       <Suspense fallback={null}>

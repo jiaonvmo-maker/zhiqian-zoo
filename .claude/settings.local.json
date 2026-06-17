@@ -33,7 +33,11 @@
       "Bash(curl -s http://localhost:51752)",
       "Bash(unset ANTHROPIC_API_KEY)",
       "Bash(npm audit *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(echo \"TypeScript 文件数: $\\(find src -name \"*.tsx\" -o -name \"*.ts\")",
+      "Bash(xargs wc -l)",
+      "Bash(awk '{print \"✅\", $9, \"-\", $5}')"
     ]
   }
 }
