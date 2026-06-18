@@ -31,13 +31,13 @@ export const productMoment: WorkMoment = {
       ],
       pings: [
         { from: '数据小助手', text: '早报：推送功能 DAU +0.3%，但点击率在第三天掉了 40%' },
-        { from: '柯基策划', text: '@你 老板问推送为啥后劲不足 你有结论吗' },
+        { from: '柯基·需求又改了', text: '@你 老板问推送为啥后劲不足 你有结论吗' },
       ],
       choices: [
         {
           label: '先拆漏斗再看',
           youSay: '我先拆点击-打开-转化的漏斗 看掉在哪一步',
-          reply: { from: '柯基策划', text: '行 下午评审前给我' },
+          reply: { from: '柯基·需求又改了', text: '行 下午评审前给我' },
           thought: '没数据就改方案，等于瞎改。这一步做对了。',
           teach: '产品看数据不是看一个总数，是找「哪一步用户放弃了」——这叫漏斗分析，入门必学。',
           next: 1,
@@ -45,7 +45,7 @@ export const productMoment: WorkMoment = {
         {
           label: '凭感觉说是文案问题',
           youSay: '可能是文案疲劳了吧 换一版试试',
-          reply: { from: '柯基策划', text: '……有数吗？老板要证据' },
+          reply: { from: '柯基·需求又改了', text: '……有数吗？老板要证据' },
           thought: '感觉常被问「证据呢」。产品说话最好能挂数据。',
           teach: '「我觉得」在产品里权重很低。「数据显示第三步流失高」才有人听。',
           next: 1,
@@ -62,13 +62,13 @@ export const productMoment: WorkMoment = {
       ],
       pings: [
         { from: '你', text: '（打开飞书文档：推送策略优化 PRD v0.3）' },
-        { from: '柯基策划', text: '范围别写太大 这周能上的才算' },
+        { from: '柯基·需求又改了', text: '范围别写太大 这周能上的才算' },
       ],
       choices: [
         {
           label: '砍 scope 只留 MVP',
           youSay: '我只写「换文案+换人群包」两件事 其他进 backlog',
-          reply: { from: '柯基策划', text: '对 就这样' },
+          reply: { from: '柯基·需求又改了', text: '对 就这样' },
           thought: '会砍需求的产品，研发才会理你。',
           teach: 'backlog = 待办池，不是不做，是「以后做」。先保 MVP 上线，是产品基本功。',
           next: 2,
@@ -76,7 +76,7 @@ export const productMoment: WorkMoment = {
         {
           label: '全写上再说',
           youSay: '智能推荐、A/B、个性化文案我都写进这版',
-          reply: { from: '浣熊程序', text: '？你认真的？' },
+          reply: { from: '浣熊·在写了真的', text: '？你认真的？' },
           thought: '贪大求全 → 排期爆炸。你学会了改文档。',
           teach: 'PRD 不是许愿池。写进去 = 研发认为要做，最后往往是你自己删。',
           next: 2,
@@ -92,15 +92,15 @@ export const productMoment: WorkMoment = {
         { term: '对齐', plain: '行业黑话=「确认大家理解一致」。不对齐就开干，后面必扯皮。' },
       ],
       pings: [
-        { from: '柯基策划', text: '@所有人 推送优化评审 3 点 腾讯会议' },
-        { from: '浣熊程序', text: '排期满了 最早下周' },
-        { from: '啄木鸟测试', text: '上次版本回归还没过 你们又改？' },
+        { from: '柯基·需求又改了', text: '@所有人 推送优化评审 3 点 腾讯会议' },
+        { from: '浣熊·在写了真的', text: '排期满了 最早下周' },
+        { from: '啄木·我录屏了', text: '上次版本回归还没过 你们又改？' },
       ],
       choices: [
         {
           label: '拉短会对齐范围',
           youSay: '范围就 MVP 两点 咱 15 分钟定死 别扩散',
-          reply: { from: '浣熊程序', text: '行 但别又加' },
+          reply: { from: '浣熊·在写了真的', text: '行 但别又加' },
           thought: '评审不是吵架，是把「做什么、不做什么」钉死。',
           teach: '产品 50% 时间在协调人。会开短、结论写进纪要，比 PPT 漂亮有用。',
           next: 3,
@@ -108,7 +108,7 @@ export const productMoment: WorkMoment = {
         {
           label: '硬答应本周上',
           youSay: '业务很急 本周能不能挤一挤',
-          reply: { from: '啄木鸟测试', text: '挤可以 质量谁背' },
+          reply: { from: '啄木·我录屏了', text: '挤可以 质量谁背' },
           thought: '答应容易，上线出问题你第一个被问。',
           teach: '「急」不是跳过测试的理由。产品要会在「快」和「稳」之间谈条件。',
           next: 3,
@@ -124,14 +124,14 @@ export const productMoment: WorkMoment = {
         { term: '变更', plain: '需求改了。改一次还好，一周改四次研发会炸。' },
       ],
       pings: [
-        { from: '浣熊程序', text: '人群包接口字段对不上 谁跟数据对齐？' },
-        { from: '柯基策划', text: '老板刚说文案要再改一版……' },
+        { from: '浣熊·在写了真的', text: '人群包接口字段对不上 谁跟数据对齐？' },
+        { from: '柯基·需求又改了', text: '老板刚说文案要再改一版……' },
       ],
       choices: [
         {
           label: '自己去找数据对齐',
           youSay: '字段我去找数据部 文案变更我评估进不进这迭代',
-          reply: { from: '浣熊程序', text: '谢了' },
+          reply: { from: '浣熊·在写了真的', text: '谢了' },
           thought: '产品不是甩手掌柜。能 unblock 人，口碑就好。',
           teach: '好产品的共性：不只会提需求，还能帮团队清障碍。',
           next: 4,
@@ -139,7 +139,7 @@ export const productMoment: WorkMoment = {
         {
           label: '让研发自己协调',
           youSay: '你们跟数据直接对吧 我这边改需求了',
-          reply: { from: '浣熊程序', text: '……' },
+          reply: { from: '浣熊·在写了真的', text: '……' },
           thought: '消息已读，信任-1。',
           teach: '研发讨厌「你行你上式」产品。协调是产品职责，不是可选项。',
           next: 4,
@@ -155,21 +155,21 @@ export const productMoment: WorkMoment = {
         { term: '迭代', plain: '一版一版改。互联网产品很少「一次做完」，都是迭代出来的。' },
       ],
       pings: [
-        { from: '柯基策划', text: '推送优化上线了 复盘文档今晚能出吗' },
+        { from: '柯基·需求又改了', text: '推送优化上线了 复盘文档今晚能出吗' },
         { from: '数据小助手', text: 'A 组点击率 +8%，B 组持平' },
       ],
       choices: [
         {
           label: '用 A/B 结论写复盘',
           youSay: '结论：B 文案胜出，下周全量；掉量原因是对照组样本太小 下轮加大',
-          reply: { from: '柯基策划', text: '可以 就按这个讲' },
+          reply: { from: '柯基·需求又改了', text: '可以 就按这个讲' },
           thought: '有结论、有下一步，这就是合格复盘。',
           teach: '复盘模板：目标 → 结果（数据）→ 原因 → 下一步。练几次就会了。',
         },
         {
           label: '写「效果不错继续努力」',
           youSay: '整体不错 后续持续优化',
-          reply: { from: '柯基策划', text: '老板要看数字 不是口号' },
+          reply: { from: '柯基·需求又改了', text: '老板要看数字 不是口号' },
           thought: '空话在产品里不顶用。你又改了一版。',
           teach: '「持续优化」= 没说啥。产品要敢用数据下判断，哪怕结论是「这版失败了」。',
         },

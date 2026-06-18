@@ -14,7 +14,6 @@ import { getWorkMoment } from '@/data/workMoments';
 import FluffyAvatar from '@/components/FluffyAvatar';
 import PlushAnimal from '@/components/pa3d/PlushAnimal';
 import { breedFromAvatar } from '@/components/pa3d/breeds';
-
 import { deptMascot } from '@/data/partyAnimalsAssets';
 
 const floors = [

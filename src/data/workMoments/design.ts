@@ -68,14 +68,14 @@ export const designMoment: WorkMoment = {
         },
       ],
       pings: [
-        { from: '柯基策划', text: '记记 App 推送设置页 redesign 周五前要  PRD 飞书链接发你了（PUSH-2025-Q2）' },
+        { from: '柯基·需求又改了', text: '记记 App 推送设置页 redesign 周五前要  PRD 飞书链接发你了（PUSH-2025-Q2）' },
         { from: '你', text: '收到 三屏都对记记推送链路吗？动效做不做？Design System 链接发我' },
       ],
       choices: [
         {
           label: '先对齐范围再开 Figma',
           youSay: '周五前三屏必上、动效不做  规范库链接发我一下',
-          reply: { from: '柯基策划', text: '对 就这些 规范在 Figma Team Library' },
+          reply: { from: '柯基·需求又改了', text: '对 就这些 规范在 Figma Team Library' },
           thought: '范围不清就画，等于给自己挖坑。',
           teach: '设计前五个问题：谁用、干啥、几屏、品牌规范在哪、上线日。比「收到就开画」专业十倍。',
           next: 1,
@@ -83,7 +83,7 @@ export const designMoment: WorkMoment = {
         {
           label: '直接打开 Figma 开画',
           youSay: '收到 我先出一版',
-          reply: { from: '柯基策划', text: '等等 动效这次不做啊' },
+          reply: { from: '柯基·需求又改了', text: '等等 动效这次不做啊' },
           thought: '返工预定。先问清楚比手快更重要。',
           teach: 'PRD 不是标题党——细节在评论区和附录里，设计要读完再动手。',
           next: 1,
@@ -126,13 +126,13 @@ export const designMoment: WorkMoment = {
       ],
       pings: [
         { from: '你', text: '（Figma：记记·推送设置 v3 · Team Library 已启用）' },
-        { from: '兔兔交互', text: '记记用户从 Feed 进设置的旅程图  你对一下入口层级' },
+        { from: '兔兔·按钮放这？', text: '记记用户从 Feed 进设置的旅程图  你对一下入口层级' },
       ],
       choices: [
         {
           label: '先对 UX 旅程再出视觉',
           youSay: '我对下 FigJam 旅程图  入口和空状态一起补',
-          reply: { from: '兔兔交互', text: '好 空状态文案我写好了' },
+          reply: { from: '兔兔·按钮放这？', text: '好 空状态文案我写好了' },
           thought: 'UI+UX 对齐，评审少挨骂。',
           teach: 'UX 想「怎么用」，UI 想「好不好看」。小厂常一人全包，大厂分工但你要能对话。',
           next: 2,
@@ -175,15 +175,15 @@ export const designMoment: WorkMoment = {
         },
       ],
       pings: [
-        { from: '柯基策划', text: '按钮再大一点 再红一点  用户找不到' },
-        { from: '喵喵设计', text: '第 8 稿了……  规范色不能乱改啊' },
-        { from: '哈士奇前端', text: '这动效要是在 Android 上性能够呛  能砍吗' },
+        { from: '柯基·需求又改了', text: '按钮再大一点 再红一点  用户找不到' },
+        { from: '喵喵·间距不对', text: '第 8 稿了……  规范色不能乱改啊' },
+        { from: '哈士·Safari 又崩', text: '这动效要是在 Android 上性能够呛  能砍吗' },
       ],
       choices: [
         {
           label: '用规范+层级回应，不动品牌色',
           youSay: '品牌色不能乱红  我用 CTA 强调色+字号+对比度  动效这版砍了',
-          reply: { from: '柯基策划', text: '行  周一看点击数据' },
+          reply: { from: '柯基·需求又改了', text: '行  周一看点击数据' },
           thought: '有 Design System 撑腰，设计师才有话语权。',
           teach: '「变大变红」不是唯一解。Contrast、Hierarchy、Whitespace 都是手段——这是专业和设计生的区别。',
           next: 3,
@@ -191,7 +191,7 @@ export const designMoment: WorkMoment = {
         {
           label: '默默改到第 9 稿',
           youSay: '……行  我改',
-          reply: { from: '喵喵设计', text: '姐妹  记得留一版「按规范的主张」进作品集' },
+          reply: { from: '喵喵·间距不对', text: '姐妹  记得留一版「按规范的主张」进作品集' },
           thought: '妥协不丢人，但要知道规范被破坏，后面更难维护。',
           teach: '改稿是常态。面试讲「我如何在业务压力和规范之间取舍」比只秀图加分。',
           next: 3,
@@ -228,14 +228,14 @@ export const designMoment: WorkMoment = {
         },
       ],
       pings: [
-        { from: '哈士奇前端', text: 'Android 圆角裁切有点怪  Figma 链接你对下能接受吗' },
-        { from: '啄木鸟测试', text: '设计走查过了吗  今晚发版' },
+        { from: '哈士·Safari 又崩', text: 'Android 圆角裁切有点怪  Figma 链接你对下能接受吗' },
+        { from: '啄木·我录屏了', text: '设计走查过了吗  今晚发版' },
       ],
       choices: [
         {
           label: '坐前端旁边 10 分钟调完',
           youSay: '我现在过去对 Dev Mode  能修的今天修  不能的记进 backlog',
-          reply: { from: '哈士奇前端', text: '谢  这样效率高' },
+          reply: { from: '哈士·Safari 又崩', text: '谢  这样效率高' },
           thought: '走查是协作，不是甩锅大会。',
           teach: '带着方案来：「这里改 2px」比「不对」有用。跟研发关系好，还原度才高。',
         },

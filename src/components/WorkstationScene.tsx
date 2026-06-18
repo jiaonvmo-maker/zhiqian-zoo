@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { departments } from '@/data/departments';
 import { npcs } from '@/data/npcs';
-import { getPartyAvatar } from '@/data/partyAnimalsAssets';
+import { assetUrl, getPartyAvatar } from '@/data/partyAnimalsAssets';
 import PrivateChat from './PrivateChat';
 import CyberBadge from './CyberBadge';
 import PAHeader from '@/components/pa/PAHeader';
@@ -11,6 +11,7 @@ import CareerLadder, { TierBadge } from '@/components/CareerLadder';
 import WorkMomentModal from '@/components/WorkMomentModal';
 import { getWorkMoment } from '@/data/workMoments';
 import Workstation3D from '@/components/Workstation3D';
+import DraggableSidePanel from '@/components/DraggableSidePanel';
 
 const TIER_ORDER = { intern: 0, associate: 1, senior: 2, director: 3, executive: 4 } as const;
 const SCENE_BG = '#e8e4df';
@@ -22,7 +23,7 @@ function NpcThumb({ npcId, deptId, size, borderColor }: { npcId: string; deptId:
       className="shrink-0 rounded-full overflow-hidden"
       style={{ width: size, height: size, border: `2px solid ${borderColor}`, background: '#fff9f2' }}
     >
-      <img src={src} alt="" className="w-full h-full object-cover object-center" draggable={false} />
+      <img src={assetUrl(src)} alt="" className="w-full h-full object-cover object-[center_20%]" draggable={false} />
     </div>
   );
 }
@@ -70,7 +71,7 @@ export default function WorkstationScene() {
         onBack={() => setPhase('sandbox')}
         icon={<NpcThumb npcId={deptNpcs[0]?.id ?? ''} deptId={dept.id} size={36} borderColor={dept.color} />}
         title={`${dept.name}工位`}
-        subtitle="1:1 立体办公室 · 拖拽旋转 · 点击深聊"
+        subtitle="侧栏可手推收起 · 拖拽旋转 · 点击深聊"
         right={
           <button type="button" onClick={() => selectDepartment(dept.id)} className="pa-btn pa-btn-pink text-xs px-4 py-1.5 h-auto min-h-0">
             💬 群聊
@@ -78,48 +79,69 @@ export default function WorkstationScene() {
         }
       />
 
-      <div className="absolute left-4 top-20 z-30 flex flex-col gap-1.5 max-h-[60vh] overflow-y-auto pr-1 scrollbar-hide">
-        <p className="text-[10px] font-extrabold mb-1 px-1" style={{ color: dept.color }}>🐾 职级带路人</p>
-        {deptNpcs.map((npc) => (
-          <button
-            key={npc.id}
-            type="button"
-            onClick={() => setSelectedNPC(npc.id)}
-            className={`flex items-center gap-2 text-left transition-colors ${hoveredNPC === npc.id ? 'pa-panel-accent' : 'pa-panel'}`}
-            style={{
-              borderColor: hoveredNPC === npc.id ? dept.color : 'var(--pa-brown-light)',
-              padding: '6px 10px',
-            }}
-            onMouseEnter={() => setHoveredNPC(npc.id)}
-            onMouseLeave={() => setHoveredNPC(null)}
-          >
-            <NpcThumb npcId={npc.id} deptId={dept.id} size={32} borderColor={dept.color} />
-            <div className="min-w-0">
-              <p className="text-[11px] font-extrabold truncate" style={{ color: '#333' }}>{npc.name}</p>
-              <p className="text-[9px] font-bold truncate" style={{ color: '#888' }}>{npc.role}</p>
-              <TierBadge label={npc.tierLabel} color={dept.color} />
-            </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="absolute top-20 right-4 sm:right-16 z-30 w-48 sm:w-56 max-h-[65vh] overflow-y-auto p-3 pa-panel scrollbar-hide" style={{ borderColor: dept.color, boxShadow: `0 6px 0 ${dept.color}66` }}>
-        <p className="text-sm font-extrabold mb-0.5" style={{ color: dept.color }}>{dept.name}</p>
-        <p className="text-[10px] font-bold mb-1" style={{ color: dept.color }}>{dept.tagline}</p>
-        <p className="text-[9px] leading-relaxed mb-2" style={{ color: '#888' }}>{dept.mission}</p>
-        <div className="flex flex-wrap gap-1 mb-3">
-          {dept.coreOutputs.map((f) => (
-            <span key={f} className="px-1.5 py-0.5 text-[8px] font-bold rounded-full" style={{ backgroundColor: dept.color + '15', color: dept.color }}>{f}</span>
+      <DraggableSidePanel
+        side="left"
+        color={dept.color}
+        peekIcon="🐾"
+        peekLabel="带路人"
+        contentClassName="w-44 sm:w-48 max-h-[60vh]"
+      >
+        <div className="flex flex-col gap-1.5 max-h-[60vh] overflow-y-auto pr-2 scrollbar-hide">
+          <p className="text-[10px] font-extrabold mb-0.5 px-1 sticky top-0 bg-[#fdfaf6]/90 py-1" style={{ color: dept.color }}>
+            🐾 职级带路人
+          </p>
+          {deptNpcs.map((npc) => (
+            <button
+              key={npc.id}
+              type="button"
+              onClick={() => setSelectedNPC(npc.id)}
+              className={`flex items-center gap-2 text-left transition-colors ${hoveredNPC === npc.id ? 'pa-panel-accent' : 'pa-panel'}`}
+              style={{
+                borderColor: hoveredNPC === npc.id ? dept.color : 'var(--pa-brown-light)',
+                padding: '6px 10px',
+              }}
+              onMouseEnter={() => setHoveredNPC(npc.id)}
+              onMouseLeave={() => setHoveredNPC(null)}
+            >
+              <NpcThumb npcId={npc.id} deptId={dept.id} size={32} borderColor={dept.color} />
+              <div className="min-w-0">
+                <p className="text-[11px] font-extrabold truncate" style={{ color: '#333' }}>{npc.name}</p>
+                <p className="text-[9px] font-bold truncate" style={{ color: '#888' }}>{npc.role}</p>
+                <TierBadge label={npc.tierLabel} color={dept.color} />
+              </div>
+            </button>
           ))}
         </div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#eee' }}>
-            <div className="h-full rounded-full" style={{ width: `${dept.chaosLevel}%`, backgroundColor: dept.chaosLevel > 60 ? '#ff6b6b' : dept.chaosLevel > 40 ? '#ffe66d' : '#a8e6cf' }} />
+      </DraggableSidePanel>
+
+      <DraggableSidePanel
+        side="right"
+        color={dept.color}
+        peekIcon="📋"
+        peekLabel={dept.shortName}
+        contentClassName="w-48 sm:w-56 max-h-[65vh]"
+      >
+        <div
+          className="max-h-[65vh] overflow-y-auto p-3 pa-panel scrollbar-hide"
+          style={{ borderColor: dept.color, boxShadow: `0 6px 0 ${dept.color}66` }}
+        >
+          <p className="text-sm font-extrabold mb-0.5" style={{ color: dept.color }}>{dept.name}</p>
+          <p className="text-[10px] font-bold mb-1" style={{ color: dept.color }}>{dept.tagline}</p>
+          <p className="text-[9px] leading-relaxed mb-2" style={{ color: '#888' }}>{dept.mission}</p>
+          <div className="flex flex-wrap gap-1 mb-3">
+            {dept.coreOutputs.map((f) => (
+              <span key={f} className="px-1.5 py-0.5 text-[8px] font-bold rounded-full" style={{ backgroundColor: dept.color + '15', color: dept.color }}>{f}</span>
+            ))}
           </div>
-          <span className="text-[8px] font-bold whitespace-nowrap" style={{ color: '#888' }}>强度 {dept.chaosLevel}%</span>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#eee' }}>
+              <div className="h-full rounded-full" style={{ width: `${dept.chaosLevel}%`, backgroundColor: dept.chaosLevel > 60 ? '#ff6b6b' : dept.chaosLevel > 40 ? '#ffe66d' : '#a8e6cf' }} />
+            </div>
+            <span className="text-[8px] font-bold whitespace-nowrap" style={{ color: '#888' }}>强度 {dept.chaosLevel}%</span>
+          </div>
+          <CareerLadder tiers={dept.careerLadder} color={dept.color} compact realScenes={dept.realScenes} voices={dept.voices} />
         </div>
-        <CareerLadder tiers={dept.careerLadder} color={dept.color} compact realScenes={dept.realScenes} voices={dept.voices} />
-      </div>
+      </DraggableSidePanel>
 
       <AnimatePresence>
         {hoveredNpcData && (

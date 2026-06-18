@@ -27,14 +27,14 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '需求单 / Story', plain: 'Jira/飞书上的任务卡，写清要做啥。' },
         ],
         pings: [
-          { from: '柯基策划', text: '推送人群包接口今天能联调吗' },
+          { from: '柯基·需求又改了', text: '推送人群包接口今天能联调吗' },
           { from: '你', text: '昨天修完登录 Bug，今天做人群包，卡在等数据字段' },
         ],
         choices: [
           {
             label: '把 block 说清楚',
             youSay: '字段定不下来我做不了 麻烦产品 @ 数据',
-            reply: { from: '柯基策划', text: '我去催' },
+            reply: { from: '柯基·需求又改了', text: '我去催' },
             thought: '会喊 block 的开发，不会被 silently 憋死。',
             teach: 'block = 被卡住。站会要说 block，否则 PM 以为你在摸鱼。',
             next: 1,
@@ -42,7 +42,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           {
             label: '只说「在写了」',
             youSay: '在推进',
-            reply: { from: '树懒全栈', text: '推进到哪了哥' },
+            reply: { from: '树懒·第四版需求', text: '推进到哪了哥' },
             thought: '「在写了」是梗，也是危险信号。',
             teach: '开发沟通要具体：完成百分之几、差什么输入。',
             next: 1,
@@ -58,14 +58,14 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '字段', plain: 'JSON 里的 key，比如 userId、title。' },
         ],
         pings: [
-          { from: '哈士奇前端', text: '你这返回少个 pushTitle 我页面空白了' },
+          { from: '哈士·Safari 又崩', text: '你这返回少个 pushTitle 我页面空白了' },
           { from: '你', text: '文档没写啊……我补' },
         ],
         choices: [
           {
             label: '更文档并修接口',
             youSay: '我补字段+更新 Swagger 十分钟后你再拉',
-            reply: { from: '哈士奇前端', text: 'OK' },
+            reply: { from: '哈士·Safari 又崩', text: 'OK' },
             thought: '联调扯皮少靠文档多靠沟通。你选对了。',
             teach: 'Swagger/接口文档 = 前后端契约。改了代码要更文档，不然下次还吵。',
             next: 2,
@@ -73,7 +73,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           {
             label: '说是前端传错',
             youSay: '你参数传错了吧',
-            reply: { from: '哈士奇前端', text: '截图甩你脸上了' },
+            reply: { from: '哈士·Safari 又崩', text: '截图甩你脸上了' },
             thought: '先查自己再甩锅，是职业素养。',
             teach: '联调黄金法则：先看日志，再开口。',
             next: 2,
@@ -89,13 +89,13 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '主分支', plain: '线上代码来源，不能随便乱合。' },
         ],
         pings: [
-          { from: '树懒全栈', text: 'PR 看了：这里没判空 并发下会炸 改一下' },
+          { from: '树懒·第四版需求', text: 'PR 看了：这里没判空 并发下会炸 改一下' },
         ],
         choices: [
           {
             label: '改完再请看',
             youSay: '收到 我加校验 改完 @ 你',
-            reply: { from: '树懒全栈', text: '嗯' },
+            reply: { from: '树懒·第四版需求', text: '嗯' },
             thought: 'CR 不是针对你人，是针对代码质量。',
             teach: '新手 CR 常改：空指针、异常处理、命名、重复代码。虚心改成长快。',
             next: 3,
@@ -103,7 +103,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           {
             label: '觉得小题大做',
             youSay: '能跑就行吧……',
-            reply: { from: '树懒全栈', text: '线上炸了算谁的' },
+            reply: { from: '树懒·第四版需求', text: '线上炸了算谁的' },
             thought: '「能跑」和「能扛流量」差很远。',
             teach: '生产环境 = 真实用户用的环境。小 bug × 大流量 = 大事故。',
             next: 3,
@@ -119,14 +119,14 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '上线 / 发版', plain: '把新代码部署到生产环境。' },
         ],
         pings: [
-          { from: '啄木鸟测试', text: '提了 3 个 Bug 其中 1 个 P0：空人群包会 500' },
-          { from: '海狸运维', text: '今晚 22:00-24:00 变更窗口' },
+          { from: '啄木·我录屏了', text: '提了 3 个 Bug 其中 1 个 P0：空人群包会 500' },
+          { from: '海狸·凌晨告警', text: '今晚 22:00-24:00 变更窗口' },
         ],
         choices: [
           {
             label: '先修 P0 再提测',
             youSay: 'P0 我 1 小时修完 再给你回归',
-            reply: { from: '啄木鸟测试', text: '行 别偷偷上线' },
+            reply: { from: '啄木·我录屏了', text: '行 别偷偷上线' },
             thought: '跟测试关系好，上线才顺。',
             teach: '回归测试 = 改完后再测一遍旧功能，防「修 A 坏 B」。',
             next: 4,
@@ -134,7 +134,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           {
             label: '求先上再修',
             youSay: '业务急 先上这个小问题后面修',
-            reply: { from: '啄木鸟测试', text: '我不签字' },
+            reply: { from: '啄木·我录屏了', text: '我不签字' },
             thought: '测试不签字，运维不敢发。规则护所有人。',
             teach: '上线流程：开发自测 → 测试验收 → 运维发布。跳步风险你背。',
             next: 4,
@@ -151,20 +151,20 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         ],
         pings: [
           { from: 'PagerDuty', text: '🔴 生产 502' },
-          { from: '柯基策划', text: '用户在骂了！！' },
+          { from: '柯基·需求又改了', text: '用户在骂了！！' },
         ],
         choices: [
           {
             label: '先回滚',
             youSay: '我先回滚 稳住了再查日志',
-            reply: { from: '海狸运维', text: '窗口开了 搞' },
+            reply: { from: '海狸·凌晨告警', text: '窗口开了 搞' },
             thought: '先止血再手术。这是标准操作。',
             teach: '热修 = 线上直接改。风险高，除非回滚不行才用。',
           },
           {
             label: '线上改一行',
             youSay: '我怀疑缓存 key 改一行就好',
-            reply: { from: '海狸运维', text: '别 回滚' },
+            reply: { from: '海狸·凌晨告警', text: '别 回滚' },
             thought: '听运维的。他们见过太多「改一行」变灾难。',
             teach: '事故复盘要写：根因、影响、怎么防再犯。开发也要参与。',
           },
@@ -407,7 +407,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           {
             label: '直接申请折扣',
             youSay: '我回去申请折扣',
-            reply: { from: '狮子销售', text: '别乱承诺！！' },
+            reply: { from: '狮子·再飞一趟', text: '别乱承诺！！' },
             thought: '折扣是筹码，不是第一反应。',
             teach: '先价值后价格。折扣要换条件：签长约、预付、案例授权等。',
             next: 2,
@@ -424,7 +424,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         ],
         pings: [
           { from: '客户王总', text: '合同今晚能签吗' },
-          { from: '鳄鱼法务', text: '第七条不行 改完再说' },
+          { from: '鳄·这个不行哈', text: '第七条不行 改完再说' },
         ],
         choices: [
           {
@@ -438,7 +438,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           {
             label: '催法务',
             youSay: '@法务 客户等着！！！',
-            reply: { from: '鳄鱼法务', text: '催没用 条款有问题' },
+            reply: { from: '鳄·这个不行哈', text: '催没用 条款有问题' },
             thought: '跟内部同事也讲关系和流程。',
             teach: '法务是帮你避坑的。提前送审比今晚催有用。',
             next: 3,
@@ -714,14 +714,14 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '管辖', plain: '打官司去哪个法院/仲裁。' },
         ],
         pings: [
-          { from: '狮子销售', text: '客户今晚要签！！合同能过吗' },
+          { from: '狮子·再飞一趟', text: '客户今晚要签！！合同能过吗' },
           { from: '你', text: '（看第 14 条）' },
         ],
         choices: [
           {
             label: '标红必改',
             youSay: '第七条无限责任不行 我标红改法 改完今晚可出',
-            reply: { from: '狮子销售', text: '客户不一定同意' },
+            reply: { from: '狮子·再飞一趟', text: '客户不一定同意' },
             thought: '法务价值在「拦下会炸的条款」。',
             teach: '不是找茬，是分配风险。无限责任=公司可能赔光。',
             next: 1,
@@ -729,7 +729,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           {
             label: '风险确认书',
             youSay: '这版我拦不住 业务负责人签风险确认书我留档',
-            reply: { from: '狮子销售', text: '……行' },
+            reply: { from: '狮子·再飞一趟', text: '……行' },
             thought: '业务坚持干，你要留证据保护自己。',
             teach: 'risk acceptance = 业务签字认账，法务已告知。',
             next: 1,
@@ -975,13 +975,13 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '需求单', plain: '谁要什么数、啥时候要、用来干啥。' },
         ],
         pings: [
-          { from: '柯基策划', text: 'DAU 咋掉了 下午汇报要用' },
+          { from: '柯基·需求又改了', text: 'DAU 咋掉了 下午汇报要用' },
         ],
         choices: [
           {
             label: '先对齐口径',
             youSay: '跟上次周报同一口径吗 要不要拆新用户/老用户',
-            reply: { from: '柯基策划', text: '跟上周一样 加拆 cohort' },
+            reply: { from: '柯基·需求又改了', text: '跟上周一样 加拆 cohort' },
             thought: '多问一句，少返工一小时。',
             teach: 'cohort = 同一批用户随时间的变化，如「1 月 1 日注册用户次日留存」。',
             next: 1,
@@ -1005,13 +1005,13 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         ],
         pings: [
           { from: '你', text: '……push_click 字段又是空的' },
-          { from: '浣熊程序', text: '我查' },
+          { from: '浣熊·在写了真的', text: '我查' },
         ],
         choices: [
           {
             label: 'partial 分析+说明',
             youSay: '埋点缺了 我先给 partial 结论 并列数据质量问题',
-            reply: { from: '柯基策划', text: '行 别瞎编就行' },
+            reply: { from: '柯基·需求又改了', text: '行 别瞎编就行' },
             thought: '诚实比假 precision 强。',
             teach: '数据质量文档要写给业务看：缺啥、影响啥、啥时候修。',
             next: 2,

@@ -62,10 +62,10 @@ export default function SalaryBoard() {
         }
       />
 
-      <div className="absolute inset-0 pt-16 pb-8 overflow-y-auto px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto space-y-4">
+      <div className="absolute inset-0 pt-[5.5rem] pb-8 overflow-y-auto px-4 sm:px-6 z-10">
+        <div className="max-w-4xl mx-auto space-y-4 pt-1">
           <section>
-            <p className="text-[10px] font-extrabold mb-2 px-1" style={{ color: '#888' }}>公司梯队</p>
+            <p className="pa-label text-xs font-extrabold mb-2 px-1" style={{ color: 'var(--pa-brown-mid)' }}>公司梯队</p>
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {COMPANY_TIER_OPTIONS.map((c) => (
                 <button
@@ -91,7 +91,7 @@ export default function SalaryBoard() {
           </section>
 
           <section>
-            <p className="text-[10px] font-extrabold mb-2 px-1" style={{ color: '#888' }}>城市</p>
+            <p className="pa-label text-xs font-extrabold mb-2 px-1" style={{ color: 'var(--pa-brown-mid)' }}>城市</p>
             <div className="flex flex-wrap gap-2">
               {CITY_OPTIONS.map((c) => (
                 <button

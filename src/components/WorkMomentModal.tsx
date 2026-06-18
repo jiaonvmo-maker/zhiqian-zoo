@@ -169,15 +169,19 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
                 <div className="grid grid-cols-2 gap-2">
                   <div className="pa-panel p-2" style={{ borderColor: 'var(--pa-green)' }}>
                     <p className="text-[9px] font-extrabold mb-1" style={{ color: 'var(--pa-green)' }}>可能适合你如果</p>
-                    {moment.mightLike.map((s) => (
-                      <p key={s} className="text-[9px] leading-snug mb-0.5" style={{ color: '#555' }}>· {s}</p>
-                    ))}
+                    <ul className="space-y-1 list-none pl-0 m-0">
+                      {moment.mightLike.map((s) => (
+                        <li key={s} className="text-[9px] leading-snug" style={{ color: '#555' }}>{s}</li>
+                      ))}
+                    </ul>
                   </div>
                   <div className="pa-panel p-2" style={{ borderColor: '#c93d3d55' }}>
                     <p className="text-[9px] font-extrabold mb-1" style={{ color: '#c93d3d' }}>可能会难受如果</p>
-                    {moment.mightStruggle.map((s) => (
-                      <p key={s} className="text-[9px] leading-snug mb-0.5" style={{ color: '#555' }}>· {s}</p>
-                    ))}
+                    <ul className="space-y-1 list-none pl-0 m-0">
+                      {moment.mightStruggle.map((s) => (
+                        <li key={s} className="text-[9px] leading-snug" style={{ color: '#555' }}>{s}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
 

@@ -17,43 +17,73 @@ export default function DepartmentChat() {
   const [inputText, setInputText] = useState('');
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedNPC, setSelectedNPC] = useState<string | null>(null);
-  const [typingNPC, setTypingNPC] = useState<string | null>(null);
   const [reactions, setReactions] = useState<Record<string, string[]>>({});
   const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null);
   const [tryWork, setTryWork] = useState(false);
+  const [historyReady, setHistoryReady] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const msgIdRef = useRef(0);
+  const revealCleanupRef = useRef<(() => void) | null>(null);
 
   const dept = departments.find((d) => d.id === selectedDept);
 
   useEffect(() => {
     if (!dept) return;
+
+    setMessages([]);
+    setHistoryReady(false);
+
     const script = generateChatScript(dept.id);
-    setMessages(script);
+    if (script.length === 0) {
+      setHistoryReady(true);
+      return;
+    }
+
+    let cancelled = false;
+    let idx = 0;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+    const clearAll = () => {
+      cancelled = true;
+      timeouts.forEach(clearTimeout);
+    };
+    revealCleanupRef.current = clearAll;
+
+    const revealNext = () => {
+      if (cancelled || idx >= script.length) {
+        if (!cancelled) setHistoryReady(true);
+        return;
+      }
+
+      const next = script[idx];
+      setMessages((prev) => [...prev, next]);
+      idx += 1;
+      if (idx >= script.length) {
+        setHistoryReady(true);
+        return;
+      }
+      timeouts.push(setTimeout(revealNext, 480));
+    };
+
+    timeouts.push(setTimeout(revealNext, 300));
+
+    return () => {
+      clearAll();
+      revealCleanupRef.current = null;
+    };
   }, [dept?.id]);
+
+  const skipHistory = () => {
+    if (!dept || historyReady) return;
+    revealCleanupRef.current?.();
+    revealCleanupRef.current = null;
+    setMessages(generateChatScript(dept.id));
+    setHistoryReady(true);
+  };
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, typingNPC]);
-
-  // Auto NPC messages every 5s
-  useEffect(() => {
-    if (!dept) return;
-    const interval = setInterval(() => {
-      const deptNpcs = npcs.filter((n) => n.departmentId === dept.id);
-      if (deptNpcs.length === 0) return;
-      const npc = deptNpcs[Math.floor(Math.random() * deptNpcs.length)];
-      const newMsg: import('@/types').ChatMessage = {
-        id: `auto-${msgIdRef.current++}`,
-        npcId: npc.id,
-        text: getNPCReply(npc.id, '').text,
-        timestamp: Date.now(),
-        mood: Math.random() > 0.7 ? 'angry' : Math.random() > 0.5 ? 'tired' : 'normal',
-      };
-      setMessages((prev) => [...prev, newMsg]);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [dept?.id]);
+  }, [messages]);
 
   if (!dept) {
     return (
@@ -84,6 +114,7 @@ export default function DepartmentChat() {
   };
 
   const handleSend = (text: string) => {
+    if (!historyReady) return;
     const trimmed = text.trim();
     if (!trimmed) return;
     const userMsg: import('@/types').ChatMessage = {
@@ -98,18 +129,14 @@ export default function DepartmentChat() {
 
     const responder = deptNpcs[Math.floor(Math.random() * deptNpcs.length)];
     if (responder) {
-      setTypingNPC(responder.id);
-      setTimeout(() => {
-        setTypingNPC(null);
-        const reply = getNPCReply(responder.id, trimmed);
-        setMessages((prev) => [...prev, {
-          id: `reply-${msgIdRef.current++}`,
-          npcId: responder.id,
-          text: reply.text,
-          timestamp: Date.now(),
-          mood: reply.mood,
-        }]);
-      }, 700);
+      const reply = getNPCReply(responder.id, trimmed);
+      setMessages((prev) => [...prev, {
+        id: `reply-${msgIdRef.current++}`,
+        npcId: responder.id,
+        text: reply.text,
+        timestamp: Date.now(),
+        mood: reply.mood,
+      }]);
     }
 
     addNotification({ id: `n-${Date.now()}`, type: 'social', title: `${dept.name}群聊`, message: `你在${dept.name}发了一条消息`, timestamp: Date.now(), read: false });
@@ -136,6 +163,11 @@ export default function DepartmentChat() {
                 <div className="pa-progress-fill" style={{ width: `${dept.chaosLevel}%` }} />
               </div>
               <span className="pa-subtitle text-[10px]">忙碌 {dept.chaosLevel}%</span>
+              {!historyReady && (
+                <button type="button" onClick={skipHistory} className="text-[10px] font-bold underline ml-1" style={{ color: dept.color }}>
+                  跳过
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -149,7 +181,7 @@ export default function DepartmentChat() {
               whileHover={{ scale: 1.15, y: -3 }}
               whileTap={{ scale: 0.9 }}
             >
-              <FluffyAvatar src={n.avatar} size={38} mood={n.personality} borderColor={dept.color} onClick={() => setSelectedNPC(n.id)} />
+              <FluffyAvatar mode="photo" src={n.avatar} size={38} borderColor={dept.color} onClick={() => setSelectedNPC(n.id)} />
             </motion.div>
           ))}
           <motion.button type="button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setShowDrawer(true)} className="pa-icon-btn w-10 h-10 ml-1">
@@ -205,7 +237,7 @@ export default function DepartmentChat() {
 
           return (
             <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-2 group">
-              <FluffyAvatar src={npc?.avatar || defaultAvatar} size={42} mood={msg.mood || npc?.personality || 'normal'} borderColor={dept.color} onClick={() => setSelectedNPC(msg.npcId)} />
+              <FluffyAvatar mode="photo" src={npc?.avatar || defaultAvatar} size={42} borderColor={dept.color} onClick={() => setSelectedNPC(msg.npcId)} />
               <div className="max-w-[75%] relative">
                 <p className="text-[10px] font-bold mb-0.5" style={{ color: '#aaa' }}>{npc?.name} 🐾</p>
                 <div className="px-4 py-2.5 text-sm pa-bubble-npc relative" style={{ border: moodBorders[msg.mood || 'normal'] || '2px solid var(--pa-paper-dark)' }}>
@@ -231,23 +263,11 @@ export default function DepartmentChat() {
           );
         })}
 
-        {typingNPC && (
-          <div className="flex gap-2 items-end">
-            <FluffyAvatar src={npcs.find((n) => n.id === typingNPC)?.avatar || ''} size={40} mood="normal" borderColor={dept.color} />
-            <div className="px-4 py-2.5 rounded-2xl" style={{ backgroundColor: '#fff', border: '2px solid #eee' }}>
-              <div className="flex gap-1">
-                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#ff6b9d' }} />
-                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#ff6b9d', animationDelay: '0.15s' }} />
-                <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: '#ff6b9d', animationDelay: '0.3s' }} />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Quick Replies */}
-      <div className="px-4 py-2 shrink-0 pa-hud border-t-0" style={{ borderRadius: 0 }}>
-        <p className="pa-subtitle text-[10px] px-1 mb-1">💬 快捷回复</p>
+      <div className={`px-4 py-2 shrink-0 pa-hud border-t-0 transition-opacity ${historyReady ? '' : 'opacity-40 pointer-events-none'}`} style={{ borderRadius: 0 }}>
+        <p className="pa-subtitle text-[10px] px-1 mb-1">{historyReady ? '💬 快捷回复' : '💬 历史消息加载中…'}</p>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {quickReplies.slice(0, 5).map((reply, i) => (
             <motion.button
@@ -267,23 +287,29 @@ export default function DepartmentChat() {
         </div>
       </div>
 
-      <div className="px-4 py-3 flex items-center gap-2 shrink-0 pa-panel mx-3 mb-3" style={{ borderRadius: 'var(--pa-radius-lg)' }}>
+      <div className={`px-4 py-3 flex items-center gap-2 shrink-0 pa-panel mx-3 mb-3 transition-opacity ${historyReady ? '' : 'opacity-40'}`} style={{ borderRadius: 'var(--pa-radius-lg)' }}>
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend(inputText)}
-          placeholder={`问问${dept.name}的前辈们，这行到底干啥...`}
-          className="flex-1 h-11 px-4 text-sm font-bold outline-none pa-input"
+          onKeyDown={(e) => e.key === 'Enter' && historyReady && handleSend(inputText)}
+          disabled={!historyReady}
+          placeholder={historyReady ? `问问${dept.name}的前辈们，这行到底干啥...` : '群消息还在往上翻…'}
+          className="flex-1 h-11 px-4 text-sm font-bold outline-none pa-input disabled:cursor-not-allowed"
         />
         <motion.button
           type="button"
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.92 }}
+          whileTap={{ scale: historyReady ? 0.92 : 1 }}
           onClick={() => handleSend(inputText)}
-          className="pa-btn pa-btn-pink w-11 h-11 min-w-[44px] p-0 text-lg pa-touch-target"
+          disabled={!historyReady}
+          aria-label="发送"
+          className="pa-icon-btn w-11 h-11 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ borderColor: dept.color }}
         >
-          🚀
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={dept.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 2 11 13" />
+            <path d="M22 2 15 22 11 13 2 9l20-7z" />
+          </svg>
         </motion.button>
       </div>
 
@@ -314,7 +340,7 @@ export default function DepartmentChat() {
                 <div className="space-y-2">
                   {deptNpcs.map((npc) => (
                     <button key={npc.id} type="button" onClick={() => setSelectedNPC(npc.id)} className="w-full flex items-center gap-2.5 p-2 text-left pa-btn pa-btn-cream h-auto min-h-0 justify-start">
-                      <FluffyAvatar src={npc.avatar} size={36} mood={npc.personality} borderColor={dept.color} />
+                      <FluffyAvatar mode="photo" src={npc.avatar} size={36} borderColor={dept.color} />
                       <div>
                         <p className="text-xs font-bold" style={{ color: '#333' }}>{npc.name}</p>
                         <p className="text-[9px] font-bold" style={{ color: '#888' }}>{npc.role}</p>

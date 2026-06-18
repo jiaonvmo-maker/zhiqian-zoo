@@ -1,4 +1,5 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { CareerTier, RealWorkScene, CommunityVoice } from '@/types';
 
 const TIER_COLORS: Record<string, string> = {
@@ -9,6 +10,37 @@ const TIER_COLORS: Record<string, string> = {
   '负责人 / VP': '#1a1a1a',
 };
 
+const SENIOR_RANKS = new Set(['高级 / 主管', '总监', '负责人 / VP']);
+
+function TierBlock({
+  tier,
+  color,
+  compact,
+}: {
+  tier: CareerTier;
+  color: string;
+  compact: boolean;
+}) {
+  const tierColor = TIER_COLORS[tier.rank] || color;
+  return (
+    <div className="relative pl-3 border-l-2" style={{ borderColor: tierColor }}>
+      <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+        <span
+          className="text-[9px] font-extrabold px-1.5 py-0.5 rounded"
+          style={{ backgroundColor: tierColor + '22', color: tierColor }}
+        >
+          {tier.rank}
+        </span>
+        <span className="text-[10px] font-bold" style={{ color: '#444' }}>{tier.roleTitle}</span>
+      </div>
+      {!compact && (
+        <p className="text-[10px] leading-relaxed mb-0.5" style={{ color: '#666' }}>{tier.dailyWork}</p>
+      )}
+      <p className="text-[9px] italic leading-snug" style={{ color: '#999' }}>▸ {tier.realityCheck}</p>
+    </div>
+  );
+}
+
 interface CareerLadderProps {
   tiers: CareerTier[];
   color: string;
@@ -18,48 +50,90 @@ interface CareerLadderProps {
 }
 
 function CareerLadderComponent({ tiers, color, compact = false, realScenes, voices }: CareerLadderProps) {
+  const [seniorOpen, setSeniorOpen] = useState(false);
+  const [scenesOpen, setScenesOpen] = useState(false);
+
+  const juniorTiers = tiers.filter((t) => !SENIOR_RANKS.has(t.rank));
+  const seniorTiers = tiers.filter((t) => SENIOR_RANKS.has(t.rank));
+
   return (
     <div className={compact ? 'space-y-2' : 'space-y-3'}>
       <p className="text-[10px] font-extrabold tracking-wide" style={{ color }}>
         职级分层 · 大概长这样
       </p>
-      {tiers.map((tier) => (
-        <div
-          key={tier.rank}
-          className="relative pl-3 border-l-2"
-          style={{ borderColor: TIER_COLORS[tier.rank] || color }}
-        >
-          <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-            <span
-              className="text-[9px] font-extrabold px-1.5 py-0.5 rounded"
-              style={{ backgroundColor: (TIER_COLORS[tier.rank] || color) + '22', color: TIER_COLORS[tier.rank] || color }}
-            >
-              {tier.rank}
-            </span>
-            <span className="text-[10px] font-bold" style={{ color: '#444' }}>{tier.roleTitle}</span>
-          </div>
-          {!compact && (
-            <p className="text-[10px] leading-relaxed mb-0.5" style={{ color: '#666' }}>{tier.dailyWork}</p>
-          )}
-          <p className="text-[9px] italic leading-snug" style={{ color: '#999' }}>▸ {tier.realityCheck}</p>
-        </div>
-      ))}
 
-      { realScenes && realScenes.length > 0 && (
-        <div className="pt-2 mt-2 border-t-2" style={{ borderColor: color + '28' }}>
-          <p className="text-[10px] font-extrabold mb-1" style={{ color }}>📋 真实一会儿</p>
-          <div className="space-y-1.5">
-            {realScenes.slice(0, compact ? 2 : 3).map((s) => (
-              <div key={s.title}>
-                <p className="text-[8px] font-bold" style={{ color }}>{s.title}</p>
-                <p className="text-[8px] leading-snug" style={{ color: '#666' }}>{s.scene}</p>
-              </div>
-            ))}
-          </div>
+      <div className="space-y-2">
+        {juniorTiers.map((tier) => (
+          <TierBlock key={tier.rank} tier={tier} color={color} compact={compact} />
+        ))}
+      </div>
+
+      {seniorTiers.length > 0 && (
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={() => setSeniorOpen((v) => !v)}
+            className="w-full flex items-center justify-between gap-2 py-1.5 px-2 rounded-lg text-left transition-colors hover:bg-black/[0.03]"
+          >
+            <span className="text-[10px] font-extrabold" style={{ color: '#f59e0b' }}>
+              高级及以上 · {seniorTiers.length} 档
+            </span>
+            <span className="text-[10px] font-bold shrink-0" style={{ color: '#aaa' }}>{seniorOpen ? '▲' : '▼'}</span>
+          </button>
+          <AnimatePresence initial={false}>
+            {seniorOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-2 pt-1.5">
+                  {seniorTiers.map((tier) => (
+                    <TierBlock key={tier.rank} tier={tier} color={color} compact={compact} />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 
-      {voices && voices.length > 0 && (
+      {realScenes && realScenes.length > 0 && (
+        <div className="pt-2 mt-1 border-t-2" style={{ borderColor: color + '28' }}>
+          <button
+            type="button"
+            onClick={() => setScenesOpen((v) => !v)}
+            className="w-full flex items-center justify-between gap-2 py-1 text-left"
+          >
+            <p className="text-[10px] font-extrabold" style={{ color }}>📋 真实一会儿</p>
+            <span className="text-[10px] font-bold shrink-0" style={{ color: '#aaa' }}>{scenesOpen ? '▲' : '▼'}</span>
+          </button>
+          <AnimatePresence initial={false}>
+            {scenesOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-1.5 pt-1">
+                  {realScenes.slice(0, compact ? 2 : 3).map((s) => (
+                    <div key={s.title}>
+                      <p className="text-[8px] font-bold" style={{ color }}>{s.title}</p>
+                      <p className="text-[8px] leading-snug" style={{ color: '#666' }}>{s.scene}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {voices && voices.length > 0 && scenesOpen && (
         <div className="pt-1 space-y-1.5">
           <p className="text-[10px] font-extrabold" style={{ color }}>💬 过来人嘀咕</p>
           {(compact ? voices.slice(0, 1) : voices).map((v, i) => (
