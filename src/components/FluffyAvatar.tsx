@@ -1,4 +1,5 @@
 import PartyAnimalAvatar from '@/components/pa3d/PartyAnimalAvatar';
+import { portraitRingStyle } from '@/components/pa3d/avatarFrame';
 import { moodFromPersonality } from '@/components/pa3d/breeds';
 import { assetUrl, defaultAvatar } from '@/data/partyAnimalsAssets';
 
@@ -25,25 +26,18 @@ function PhotoAvatar({
   className,
 }: Pick<FluffyAvatarProps, 'src' | 'alt' | 'size' | 'borderColor' | 'onClick' | 'className'>) {
   const w = size ?? 48;
-  const frameStyle = {
-    width: w,
-    height: w,
-    borderRadius: '50%',
-    border: `3px solid ${borderColor ?? 'var(--pa-orange)'}`,
-    boxShadow: `0 2px 0 ${borderColor ?? 'var(--pa-orange)'}66, 0 4px 10px rgba(0,0,0,0.08)`,
-    background: 'linear-gradient(180deg, #e8f6fc 0%, #fff9f2 100%)',
-  };
+  const ring = portraitRingStyle(w, borderColor ?? 'var(--pa-orange)');
 
   const img = (
     <div
       className={`relative flex-shrink-0 inline-block overflow-hidden ${onClick ? '' : className ?? ''}`}
-      style={frameStyle}
+      style={ring}
     >
       <img
         src={assetUrl(src || defaultAvatar)}
         alt={alt}
         draggable={false}
-        className="w-full h-full object-cover object-[center_20%]"
+        className="absolute inset-0 m-auto w-[88%] h-[88%] object-contain object-center"
         onError={(e) => {
           const imgEl = e.currentTarget;
           if (imgEl.dataset.fallback) return;

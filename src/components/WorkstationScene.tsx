@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { departments } from '@/data/departments';
 import { npcs } from '@/data/npcs';
-import { assetUrl, getPartyAvatar } from '@/data/partyAnimalsAssets';
+import { getPartyAvatar } from '@/data/partyAnimalsAssets';
 import PrivateChat from './PrivateChat';
 import CyberBadge from './CyberBadge';
 import PAHeader from '@/components/pa/PAHeader';
@@ -16,16 +16,11 @@ import DraggableSidePanel from '@/components/DraggableSidePanel';
 const TIER_ORDER = { intern: 0, associate: 1, senior: 2, director: 3, executive: 4 } as const;
 const SCENE_BG = '#e8e4df';
 
+import FluffyAvatar from '@/components/FluffyAvatar';
+
 function NpcThumb({ npcId, deptId, size, borderColor }: { npcId: string; deptId: string; size: number; borderColor: string }) {
   const src = getPartyAvatar(npcId, deptId);
-  return (
-    <div
-      className="shrink-0 rounded-full overflow-hidden"
-      style={{ width: size, height: size, border: `2px solid ${borderColor}`, background: '#fff9f2' }}
-    >
-      <img src={assetUrl(src)} alt="" className="w-full h-full object-cover object-[center_20%]" draggable={false} />
-    </div>
-  );
+  return <FluffyAvatar mode="photo" src={src} size={size} borderColor={borderColor} showExpression={false} />;
 }
 
 export default function WorkstationScene() {
