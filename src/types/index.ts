@@ -1,4 +1,4 @@
-export type AppPhase = 'entry' | 'survey' | 'sandbox' | 'workstation' | 'department' | 'meta';
+export type AppPhase = 'entry' | 'survey' | 'sandbox' | 'workstation' | 'department' | 'meta' | 'salary';
 
 export type ButtonResult = 'success' | 'fire' | 'blame';
 

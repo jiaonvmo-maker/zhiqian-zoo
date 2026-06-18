@@ -257,7 +257,14 @@ export default function OfficeBuilding() {
         icon="🏢"
         title="职业探索大厦"
         subtitle="11 条业务线 · 5 层职级全景 · 点击楼层查阅"
-        right={<span className="pa-tag-pink text-xs px-3 py-1">{departments.length} 部门</span>}
+        right={
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setPhase('salary')} className="pa-btn pa-btn-cream text-xs px-3 py-1.5 h-auto min-h-0">
+              💰 薪资
+            </button>
+            <span className="pa-tag-pink text-xs px-3 py-1">{departments.length} 部门</span>
+          </div>
+        }
       />
 
       <div className="absolute left-4 sm:left-6 top-[5.5rem] z-30 w-56 pa-glass-card p-4 hidden sm:block">

@@ -29,9 +29,20 @@ export default function EntryGame() {
     setButtons(initButtons());
   }, []);
 
-  const handleClick = useCallback((id: number, result: 'success' | 'fire' | 'blame') => {
+  const handleClick = useCallback((id: number, result: 'success' | 'fire' | 'blame', label: string) => {
     if (clickedId !== null) return;
     setClickedId(id);
+
+    if (label === '查薪资数据') {
+      setFinalText('薪资面板加载中…');
+      setTimeout(() => setPhase('salary'), 900);
+      return;
+    }
+    if (label === '先逛大厦') {
+      setFinalText('直达职业大厦！');
+      setTimeout(() => setPhase('sandbox'), 900);
+      return;
+    }
 
     if (result === 'fire') {
       setFinalText(FIRE_TEXTS[Math.floor(Math.random() * FIRE_TEXTS.length)]);
@@ -122,7 +133,7 @@ export default function EntryGame() {
                 transition={{ delay: 0.35 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={!clickedId ? { scale: 1.02, y: -2 } : {}}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => handleClick(btn.id, btn.result)}
+                onClick={() => handleClick(btn.id, btn.result, btn.label)}
                 disabled={clickedId !== null}
                 className={`w-full h-13 py-3.5 px-5 text-sm ${btnClass} pa-btn-height`}
               >

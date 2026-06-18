@@ -5,6 +5,7 @@ import EntryGame from '@/components/EntryGame';
 import QuickSurvey from '@/components/QuickSurvey';
 import DepartmentChat from '@/components/DepartmentChat';
 import MetaBoard from '@/components/MetaBoard';
+import SalaryBoard from '@/components/SalaryBoard';
 import NotificationSystem from '@/components/NotificationSystem';
 import { LoadingScreen, ErrorFallback, SceneShell } from '@/components/LoadingScreen';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -86,6 +87,18 @@ export default function App() {
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
             <DepartmentChat />
+          </motion.div>
+        )}
+
+        {phase === 'salary' && (
+          <motion.div
+            key="salary"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <SalaryBoard />
           </motion.div>
         )}
 
