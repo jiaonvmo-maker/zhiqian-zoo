@@ -119,7 +119,7 @@ export const perfMonitor = new PerformanceMonitor();
 /**
  * Decorator/wrapper for measuring function execution time
  */
-export function measurePerformance<T extends (...args: any[]) => any>(
+export function measurePerformance<T extends (...args: unknown[]) => unknown>(
   fn: T,
   name?: string
 ): T {
@@ -138,7 +138,7 @@ export function measurePerformance<T extends (...args: any[]) => any>(
       }
 
       perfMonitor.end(metricName);
-      return result;
+      return result as ReturnType<T>;
     } catch (error) {
       perfMonitor.end(metricName);
       throw error;

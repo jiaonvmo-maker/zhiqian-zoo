@@ -193,7 +193,7 @@ export default function WorkstationScene() {
       <AnimatePresence>{showBadge && <CyberBadge />}</AnimatePresence>
       <AnimatePresence>
         {tryWork && getWorkMoment(dept.id) && (
-          <WorkMomentModal moment={getWorkMoment(dept.id)!} color={dept.color} onClose={() => setTryWork(false)} />
+          <WorkMomentModal moment={getWorkMoment(dept.id)!} color={dept.color} source="workstation" onClose={() => setTryWork(false)} />
         )}
       </AnimatePresence>
     </div>

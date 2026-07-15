@@ -211,6 +211,93 @@
   color: var(--pa-pink-dark);
 }
 
+/* ===== 工牌整卡 — 绳夹掉落 ===== */
+.pa-id-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 0;
+  max-width: 100%;
+}
+
+.pa-id-badge__rig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  margin-bottom: -6px;
+}
+
+.pa-id-badge__strap {
+  width: 16px;
+  height: min(72px, 12vh);
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      var(--pa-orange) 0 10px,
+      var(--pa-cream) 10px 18px,
+      var(--pa-gold) 18px 28px
+    );
+  border: 1.5px solid var(--pa-orange-dark);
+  box-shadow:
+    1px 0 0 rgba(255, 255, 255, 0.35),
+    0 4px 10px rgba(74, 63, 53, 0.12);
+}
+
+.pa-id-badge__clip {
+  width: 30px;
+  height: 18px;
+  margin-top: -3px;
+  border-radius: 5px;
+  border: 2px solid var(--pa-brown-mid);
+  background:
+    linear-gradient(165deg, #f4efe6 0%, #d8cfc4 45%, #b8a890 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 2px 0 rgba(74, 63, 53, 0.18);
+}
+
+.pa-id-badge__card {
+  position: relative;
+  width: 20rem;
+  max-width: calc(100vw - 2.5rem);
+  padding: 1.1rem 1.5rem 1.5rem;
+  background:
+    linear-gradient(180deg, #fffefb 0%, var(--pa-white) 40%, #faf6f0 100%);
+  border: 2px solid var(--pa-orange);
+  border-radius: 14px 14px 18px 18px;
+  box-shadow:
+    0 4px 0 var(--pa-orange-dark),
+    0 10px 28px rgba(196, 98, 62, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.pa-id-badge__slot {
+  display: block;
+  width: 42px;
+  height: 12px;
+  margin: 0 auto 0.85rem;
+  border-radius: 999px;
+  border: 2px solid var(--pa-brown-mid);
+  background:
+    radial-gradient(ellipse at 50% 40%, #3a322c 0%, #1f1a17 70%);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.pa-id-badge__header {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-align: center;
+  color: var(--pa-brown-mid);
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+}
+
 /* ===== 手戳印章 — 发癫 vibe 角标 ===== */
 .pa-stamp {
   display: inline-block;

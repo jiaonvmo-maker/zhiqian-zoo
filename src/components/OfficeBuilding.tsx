@@ -15,19 +15,20 @@ import FluffyAvatar from '@/components/FluffyAvatar';
 import PlushAnimal from '@/components/pa3d/PlushAnimal';
 import { breedFromAvatar } from '@/components/pa3d/breeds';
 import { deptMascot } from '@/data/partyAnimalsAssets';
+import { AnalyticsEvents, track } from '@/analytics';
 
 const floors = [
-  { id: 'management', name: '管理层', color: '#c9a227', icon: '👑', npcImg: deptMascot.management },
-  { id: 'legal', name: '法务部', color: '#8e8e93', icon: '⚖️', npcImg: deptMascot.legal },
-  { id: 'finance', name: '财务部', color: '#00c7be', icon: '💵', npcImg: deptMascot.finance },
-  { id: 'design', name: '设计部', color: '#ff2d55', icon: '🎨', npcImg: deptMascot.design },
-  { id: 'product', name: '产品部', color: '#34c759', icon: '💡', npcImg: deptMascot.product },
-  { id: 'commercial', name: '商业化', color: '#af52de', icon: '💰', npcImg: deptMascot.commercial },
-  { id: 'tech', name: '技术部', color: '#007aff', icon: '💻', npcImg: deptMascot.tech },
-  { id: 'data', name: '数据部', color: '#ff6b35', icon: '📊', npcImg: deptMascot.data },
-  { id: 'operation', name: '运营部', color: '#ff9500', icon: '📢', npcImg: deptMascot.operation },
-  { id: 'hr', name: '人事部', color: '#5856d6', icon: '👥', npcImg: deptMascot.hr },
-  { id: 'support', name: '支持部', color: '#64d2ff', icon: '🎧', npcImg: deptMascot.support },
+  { id: 'management', name: '管理层', color: '#d4a84b', icon: '👑', npcImg: deptMascot.management },
+  { id: 'legal', name: '法务部', color: '#9a958c', icon: '⚖️', npcImg: deptMascot.legal },
+  { id: 'finance', name: '财务部', color: '#5fb8a8', icon: '💵', npcImg: deptMascot.finance },
+  { id: 'design', name: '设计部', color: '#e8909c', icon: '🎨', npcImg: deptMascot.design },
+  { id: 'product', name: '产品部', color: '#7cbc8a', icon: '💡', npcImg: deptMascot.product },
+  { id: 'commercial', name: '商业化', color: '#b088c4', icon: '💰', npcImg: deptMascot.commercial },
+  { id: 'tech', name: '技术部', color: '#6a9ecc', icon: '💻', npcImg: deptMascot.tech },
+  { id: 'data', name: '数据部', color: '#e0966a', icon: '📊', npcImg: deptMascot.data },
+  { id: 'operation', name: '运营部', color: '#e0a85c', icon: '📢', npcImg: deptMascot.operation },
+  { id: 'hr', name: '人事部', color: '#9590b8', icon: '👥', npcImg: deptMascot.hr },
+  { id: 'support', name: '支持部', color: '#7eb0c4', icon: '🎧', npcImg: deptMascot.support },
 ].reverse();
 
 type Floor = (typeof floors)[number];
@@ -38,8 +39,8 @@ const TOWER_DEPTH = 3.05;
 const FLOOR_HEIGHT = 0.36;
 const FLOOR_GAP = 0.055;
 
-function softenColor(hex: string, amount = 0.32) {
-  return new THREE.Color(hex).lerp(new THREE.Color('#fff9f4'), amount).getStyle();
+function softenColor(hex: string, amount = 0.28) {
+  return new THREE.Color(hex).lerp(new THREE.Color('#fff8f0'), amount).getStyle();
 }
 
 function floorY(index: number) {
@@ -113,16 +114,16 @@ function FloorBlock({ floor, index, hovered, selected, onHover, onSelect }: {
       >
         <meshStandardMaterial
           color={bodyColor}
-          roughness={0.38}
-          metalness={0.02}
+          roughness={0.48}
+          metalness={0.03}
           emissive={active ? floor.color : '#000000'}
-          emissiveIntensity={active ? 0.14 : 0}
+          emissiveIntensity={active ? 0.1 : 0}
         />
       </RoundedBox>
 
       <mesh position={[-TOWER_WIDTH / 2 + 0.18, 0.02, TOWER_DEPTH / 2 + 0.015]} castShadow>
         <boxGeometry args={[0.1, FLOOR_HEIGHT * 0.72, 0.03]} />
-        <meshStandardMaterial color={floor.color} roughness={0.35} />
+        <meshStandardMaterial color={floor.color} roughness={0.4} />
       </mesh>
 
       <FloorLabel text={floor.name} />
@@ -130,7 +131,7 @@ function FloorBlock({ floor, index, hovered, selected, onHover, onSelect }: {
       {active && (
         <mesh position={[0, 0, TOWER_DEPTH / 2 + 0.04]} rotation={[0, 0, 0]}>
           <ringGeometry args={[TOWER_WIDTH * 0.22, TOWER_WIDTH * 0.26, 32]} />
-          <meshBasicMaterial color={floor.color} transparent opacity={0.55} />
+          <meshBasicMaterial color={floor.color} transparent opacity={0.45} />
         </mesh>
       )}
     </group>
@@ -227,7 +228,7 @@ function Building3D({ hoveredFloor, selectedFloor, onHover, onSelect }: {
 }
 
 export default function OfficeBuilding() {
-  const { enterWorkstation, setPhase } = useGameStore();
+  const { enterWorkstation, setPhase, markDeptVisited } = useGameStore();
   const [hoveredFloor, setHoveredFloor] = useState<string | null>(null);
   const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
   const [tryWorkDept, setTryWorkDept] = useState<string | null>(null);
@@ -240,6 +241,14 @@ export default function OfficeBuilding() {
     if (selectedFloor) void import('@/components/WorkstationScene');
   }, [selectedFloor]);
 
+  const handleFloorSelect = (id: string | null) => {
+    setSelectedFloor(id);
+    if (id) {
+      markDeptVisited(id);
+      track(AnalyticsEvents.FLOOR_SELECT, { dept_id: id, source: 'office_building' }, 'sandbox');
+    }
+  };
+
   return (
     <div className="relative w-full h-screen overflow-hidden pa-bg-lobby">
       <div className="absolute inset-0 pt-16" style={{ width: '100%', height: 'calc(100vh - 4rem)', background: SCENE_BG }}>
@@ -247,15 +256,15 @@ export default function OfficeBuilding() {
           hoveredFloor={hoveredFloor}
           selectedFloor={selectedFloor}
           onHover={setHoveredFloor}
-          onSelect={setSelectedFloor}
+          onSelect={handleFloorSelect}
         />
       </div>
 
       <PAHeader
         onBack={() => setPhase('entry')}
         icon="🏢"
-        title="职业探索大厦"
-        subtitle="11 条业务线 · 5 层职级全景 · 点击楼层查阅"
+        title="这谁写的大楼"
+        subtitle="11 层全员装忙 · 点进去就逃不出对齐会"
         right={
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setPhase('salary')} className="pa-btn pa-btn-cream text-xs px-3 py-1.5 h-auto min-h-0">
@@ -355,38 +364,40 @@ export default function OfficeBuilding() {
                 <CareerLadder tiers={deptData.careerLadder} color={deptData.color} realScenes={deptData.realScenes} voices={deptData.voices} />
               </div>
 
-              <div className="shrink-0 flex flex-col gap-2 p-4 sm:p-6 pt-3 border-t-2" style={{ borderColor: deptData.color + '33' }}>
-                <motion.button
-                  type="button"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => setTryWorkDept(selectedFloor)}
-                  className="w-full py-3 text-sm pa-btn pa-btn-pink pa-btn-height"
-                >
-                  🎭 干一天试试 · 含黑话讲解
-                </motion.button>
-                <div className="flex gap-2">
+              <div className="shrink-0 p-4 sm:p-5 pt-3 border-t-2 space-y-2.5" style={{ borderColor: deptData.color + '33' }}>
+                <div className="grid grid-cols-2 gap-2.5">
                   <motion.button
                     type="button"
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    whileTap={{ scale: 0.96 }}
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setTryWorkDept(selectedFloor)}
+                    className="h-11 px-2 text-xs sm:text-sm pa-btn pa-btn-pink leading-tight"
+                  >
+                    干一天试试
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.97 }}
                     onMouseEnter={() => { import('@/components/WorkstationScene'); }}
                     onClick={() => { enterWorkstation(selectedFloor); setSelectedFloor(null); }}
-                    className="flex-1 py-3 text-sm pa-btn pa-btn-dept"
-                    style={{ background: `linear-gradient(180deg, ${deptData.color}ee, ${deptData.color})` }}
+                    className="h-11 px-2 text-xs sm:text-sm pa-btn pa-btn-dept leading-tight"
+                    style={{
+                      background: `linear-gradient(180deg, ${deptData.color}dd, ${deptData.color})`,
+                      borderColor: deptData.color,
+                      boxShadow: `0 3px 0 ${deptData.color}99, 0 4px 10px ${deptData.color}22`,
+                    }}
                   >
-                    进入工位 · 对话各职级
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => setSelectedFloor(null)}
-                    className="px-4 py-3 text-sm pa-btn pa-btn-cream"
-                  >
-                    先撤
+                    进入工位
                   </motion.button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedFloor(null)}
+                  className="w-full text-center text-xs py-1.5 pa-subtitle hover:underline"
+                >
+                  先撤
+                </button>
               </div>
             </div>
           </motion.div>
@@ -398,6 +409,7 @@ export default function OfficeBuilding() {
           <WorkMomentModal
             moment={getWorkMoment(tryWorkDept)!}
             color={departments.find((d) => d.id === tryWorkDept)?.color ?? 'var(--pa-orange)'}
+            source="office_building"
             onClose={() => setTryWorkDept(null)}
           />
         )}

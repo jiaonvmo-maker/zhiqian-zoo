@@ -55,6 +55,8 @@ export const designMoment: WorkMoment = {
         { term: 'PRD', plain: '产品需求文档：做哪个页面、有哪些功能、优先级如何。', chain: '产品写 → 设计读 → 研发实现' },
         { term: '交互稿 / 线框', plain: '灰框布局，先定「放哪、怎么点」，再上色做视觉。', chain: 'UX 出 → UI 在此基础上美化' },
         { term: '高保真', plain: '接近最终 App 效果的视觉稿，开发主要对着它还原。', chain: '设计出 → 研发走查对照' },
+        { term: 'redesign', plain: '改版重设计——通常不是全盘推翻，而是按范围改指定页面。' },
+        { term: 'Feed', plain: '信息流首页：用户刷动态的那一屏，很多入口从这里进去。' },
       ],
       tools: [
         {
@@ -122,6 +124,15 @@ export const designMoment: WorkMoment = {
           today: '不手画新按钮，从库里拖 Primary Button，改文案即可',
           learn: 'nice',
           learnTip: '面试作品集也建议用组件思维——面试官能看出你有没有工业界习惯',
+        },
+        {
+          name: 'FigJam',
+          icon: '🗺️',
+          what: 'Figma 旗下白板：画用户旅程、信息架构、头脑风暴',
+          who: 'UX、产品、设计早期对齐',
+          today: '对照「从 Feed 进设置」旅程图，确认入口层级和空状态',
+          learn: 'nice',
+          learnTip: '会看旅程图、对齐节点即可，不必精通所有工具',
         },
       ],
       pings: [
@@ -205,6 +216,8 @@ export const designMoment: WorkMoment = {
         { term: '走查 Design QA', plain: '对照设计稿检查开发实现，列差异清单。' },
         { term: '还原度', plain: '做出来的和稿像不像——设计师的职业脸面。' },
         { term: 'Design Token', plain: '色值、字号等变量名，如 color-primary，代码和设计共用。' },
+        { term: 'P0', plain: '最高优先级问题。视觉上如按钮点不到、文字看不清——不该「以后再说」。' },
+        { term: 'backlog', plain: '待办池：今天修不完的差异记进去，排到后续迭代。' },
       ],
       tools: [
         {
@@ -254,7 +267,9 @@ export const designMoment: WorkMoment = {
     keyJargon: [
       { term: 'PRD / 高保真 / 交互稿', plain: '需求文档；接近成品的视觉稿；线框布局' },
       { term: 'Design System / 组件库', plain: '设计规范；可复用 UI 模块' },
+      { term: 'Feed / redesign', plain: '信息流首页；页面改版' },
       { term: '评审 / 走查 / 还原度', plain: '过稿；对开发实现；像不像稿' },
+      { term: 'P0 / backlog', plain: '最高优视觉问题；待修进待办池' },
       { term: 'CTA / Design Token', plain: '核心行动按钮；设计变量与代码对齐' },
     ],
     toolbox: [

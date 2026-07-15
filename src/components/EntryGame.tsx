@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGameStore } from '@/store/gameStore';
+import { hasSavedProgress, useGameStore } from '@/store/gameStore';
 import PABackground from '@/components/pa/PABackground';
 import FluffyAvatar from '@/components/FluffyAvatar';
 import { entryShowcase } from '@/data/partyAnimalsAssets';
+import { departments } from '@/data/departments';
+import { AnalyticsEvents, track } from '@/analytics';
 
 const LABELS = ['先逛大厦', '做匹配测评', '问过来人', '查薪资数据', '跟风热门', '再观望下'];
 const FIRE_TEXTS = ['赛道信号不匹配，建议重测', '这个方向和你的画像偏差较大', '志愿填早了——刷新重来'];
@@ -17,21 +19,60 @@ function initButtons() {
   return finalBtns.sort(() => Math.random() - 0.5);
 }
 
+function resumeHintText(
+  selectedDept: string | null,
+  userTitle: string | undefined,
+  visitedCount: number,
+) {
+  if (selectedDept) {
+    const d = departments.find((x) => x.id === selectedDept);
+    if (d) return `你上次逛到「${d.shortName}」`;
+  }
+  if (userTitle) return `你的画像还在 · ${userTitle}`;
+  if (visitedCount > 0) return `已逛过 ${visitedCount} 个部门`;
+  return '进度还在，接着逛？';
+}
+
 export default function EntryGame() {
   const setPhase = useGameStore((s) => s.setPhase);
-  const [buttons, setButtons] = useState<{ id: number; label: string; result: 'success' | 'fire' | 'blame' }[]>([]);
+  const continueJourney = useGameStore((s) => s.continueJourney);
+  const resetProgress = useGameStore((s) => s.resetProgress);
+  const user = useGameStore((s) => s.user);
+  const resumePhase = useGameStore((s) => s.resumePhase);
+  const selectedDept = useGameStore((s) => s.selectedDept);
+  const visitedDepts = useGameStore((s) => s.visitedDepts);
+  const completedWorkMoments = useGameStore((s) => s.completedWorkMoments);
+
+  const [hydrated, setHydrated] = useState(() => useGameStore.persist.hasHydrated());
+  const [buttons] = useState<{ id: number; label: string; result: 'success' | 'fire' | 'blame' }[]>(initButtons);
   const [clickedId, setClickedId] = useState<number | null>(null);
   const [finalText, setFinalText] = useState('');
   const [hiddenClicked, setHiddenClicked] = useState(false);
   const [showShake, setShowShake] = useState(false);
 
   useEffect(() => {
-    setButtons(initButtons());
+    const unsub = useGameStore.persist.onFinishHydration(() => setHydrated(true));
+    if (useGameStore.persist.hasHydrated()) setHydrated(true);
+    return unsub;
   }, []);
+
+  const saved = hydrated && hasSavedProgress({
+    user,
+    resumePhase,
+    visitedDepts,
+    completedWorkMoments,
+  });
+  const hint = resumeHintText(selectedDept, user?.title, visitedDepts.length);
 
   const handleClick = useCallback((id: number, result: 'success' | 'fire' | 'blame', label: string) => {
     if (clickedId !== null) return;
     setClickedId(id);
+
+    track(AnalyticsEvents.ENTRY_BUTTON_CLICK, {
+      button_id: id,
+      button_label: label,
+      result,
+    }, 'entry');
 
     if (label === '查薪资数据') {
       setFinalText('薪资面板加载中…');
@@ -39,7 +80,7 @@ export default function EntryGame() {
       return;
     }
     if (label === '先逛大厦') {
-      setFinalText('直达职业大厦！');
+      setFinalText('直达这谁写的大楼！');
       setTimeout(() => setPhase('sandbox'), 900);
       return;
     }
@@ -58,8 +99,30 @@ export default function EntryGame() {
 
   const handleHiddenClick = useCallback(() => {
     setHiddenClicked(true);
+    track(AnalyticsEvents.ENTRY_EASTER_EGG, {}, 'entry');
     setTimeout(() => setPhase('survey'), 800);
   }, [setPhase]);
+
+  const handleContinue = useCallback(() => {
+    track(AnalyticsEvents.ENTRY_BUTTON_CLICK, {
+      button_id: 'continue',
+      button_label: '继续',
+      result: 'success',
+    }, 'entry');
+    continueJourney();
+  }, [continueJourney]);
+
+  const handleRestart = useCallback(() => {
+    track(AnalyticsEvents.ENTRY_BUTTON_CLICK, {
+      button_id: 'restart',
+      button_label: '重新开始',
+      result: 'blame',
+    }, 'entry');
+    resetProgress();
+    setClickedId(null);
+    setFinalText('');
+    setHiddenClicked(false);
+  }, [resetProgress]);
 
   return (
     <PABackground variant="sky">
@@ -113,6 +176,35 @@ export default function EntryGame() {
             </motion.div>
           ))}
         </div>
+
+        {saved && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-sm mb-5 pa-panel px-5 py-4 text-center"
+          >
+            <p className="pa-label text-[10px] mb-1">欢迎回来</p>
+            <p className="pa-subtitle text-sm mb-4">{hint}</p>
+            <div className="flex flex-col gap-2.5">
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handleContinue}
+                className="w-full py-3.5 px-5 text-sm pa-btn pa-btn-green pa-btn-height"
+              >
+                继续
+              </motion.button>
+              <button
+                type="button"
+                onClick={handleRestart}
+                className="text-xs pa-subtitle underline-offset-2 hover:underline py-1"
+              >
+                重新开始
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         <div className="w-full max-w-sm space-y-3">
           {buttons.map((btn, i) => {

@@ -55,7 +55,7 @@ export default function PartyAnimalAvatar({
 }: PartyAnimalAvatarProps) {
   const breed = useMemo(() => breedFromAvatar(src), [src]);
   const plushMood = useMemo(() => moodFromPersonality(mood), [mood]);
-  const phase = useMemo(() => Math.random() * Math.PI * 2, []);
+  const [phase] = useState(() => Math.random() * Math.PI * 2);
   const [visible, setVisible] = useState(true);
   const wrapRef = useRef<HTMLDivElement>(null);
   const frame = AVATAR_FRAME[variant];

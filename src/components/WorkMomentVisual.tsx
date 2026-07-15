@@ -2,6 +2,17 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { StepVisual } from '@/data/workMomentTypes';
 import { companyContext } from '@/data/companyContext';
+import {
+  TechOncallMock,
+  OpsAnalyticsMock,
+  CrmPipelineMock,
+  HrAtsMock,
+  FinanceExpenseMock,
+  LegalContractMock,
+  MgmtOkrMock,
+  SupportTicketMock,
+  DataBiMock,
+} from '@/components/WorkMomentDeptVisuals';
 
 interface WorkMomentVisualProps {
   visual: StepVisual;
@@ -9,6 +20,8 @@ interface WorkMomentVisualProps {
 }
 
 type MetricId = 'dau' | 'open' | 'ret';
+type DashboardNavId = 'overview' | 'push' | 'behavior';
+type BehaviorInsightId = 'events' | 'path' | 'segment';
 type FigmaZone = 'canvas' | 'library' | 'layers';
 
 function BrowserChrome({ title, children }: { title: string; children: ReactNode }) {
@@ -203,14 +216,120 @@ function MetricDetailPanel({ id, color }: { id: MetricId; color: string }) {
   );
 }
 
+function UserBehaviorPanel({ color }: { color: string }) {
+  const [selected, setSelected] = useState<BehaviorInsightId | null>(null);
+  const insights: {
+    id: BehaviorInsightId;
+    title: string;
+    value: string;
+    note: string;
+    detail: string;
+    chips: string[];
+    warn?: boolean;
+  }[] = [
+    {
+      id: 'events',
+      title: '关键行为埋点',
+      value: '3/5 步有数',
+      note: '缺「开启成功」事件',
+      detail: '用户点了推送设置页之后，系统能看到「进入页」「点击开关」「授权弹窗」，但看不到最后是否真的开启成功。产品要先补埋点，否则复盘会断在最后一步。',
+      chips: ['进入设置页', '点击开关', '授权弹窗', '开启成功缺失'],
+      warn: true,
+    },
+    {
+      id: 'path',
+      title: '用户路径',
+      value: '42% 卡在授权',
+      note: '跳出集中在系统弹窗',
+      detail: '100 个进入设置页的用户里，62 个会点击开关，但只有 37 个完成授权。说明问题不一定是文案，而可能是授权前的解释不够清楚。',
+      chips: ['设置页 100%', '点开关 62%', '授权完成 37%'],
+      warn: true,
+    },
+    {
+      id: 'segment',
+      title: '人群分层',
+      value: '新用户低 18%',
+      note: '新用户更不愿授权',
+      detail: '老用户知道记记会提醒记账，授权率更高；新用户还没感受到价值，直接弹系统授权容易拒绝。下一版应先给新用户解释「开启后会得到什么」。',
+      chips: ['新用户', '老用户', 'iOS', 'Android'],
+    },
+  ];
+  const active = insights.find((item) => item.id === selected);
+
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-3 gap-1">
+        {insights.map((item, i) => (
+          <motion.button
+            key={item.id}
+            type="button"
+            onClick={() => setSelected((cur) => (cur === item.id ? null : item.id))}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 + i * 0.08, type: 'spring', stiffness: 300, damping: 24 }}
+            whileTap={{ scale: 0.96 }}
+            className="rounded-md p-1.5 relative overflow-hidden text-left cursor-pointer"
+            style={{
+              backgroundColor: '#fff',
+              border: `2px solid ${selected === item.id ? color : '#e8e8e8'}`,
+              boxShadow: selected === item.id ? `0 0 0 3px ${color}22` : `0 0 0 1px ${color}10`,
+            }}
+          >
+            <PulseOverlay color={color} show={!selected} />
+            <p className="text-[7px] font-bold relative flex items-center gap-0.5 flex-wrap" style={{ color: '#999' }}>
+              <span className="truncate">{item.title}</span>
+              <ClickableChip expanded={selected === item.id} color={color} />
+            </p>
+            <p className="text-[11px] font-extrabold relative" style={{ color: item.warn ? '#e85d4c' : '#333' }}>{item.value}</p>
+            <p className="text-[7px] font-bold relative leading-tight" style={{ color: '#777' }}>{item.note}</p>
+          </motion.button>
+        ))}
+      </div>
+
+      {!selected && <CalloutPulse text="点用户行为卡片，看它具体在分析什么" color={color} />}
+
+      <ExpandPanel show={selected !== null}>
+        <div className="rounded-md p-2" style={{ backgroundColor: '#fff', border: `1px solid ${color}44` }}>
+          <AnimatePresence mode="wait">
+            {active && (
+              <motion.div key={active.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>
+                <p className="text-[8px] font-extrabold mb-1" style={{ color }}>{active.title} · 白话解释</p>
+                <p className="text-[8px] leading-snug" style={{ color: '#555' }}>{active.detail}</p>
+                <div className="mt-2 flex gap-1 flex-wrap">
+                  {active.chips.map((chip, i) => (
+                    <motion.span
+                      key={chip}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.06 }}
+                      className="text-[7px] font-bold px-1.5 py-0.5 rounded"
+                      style={{ backgroundColor: chip.includes('缺失') ? '#e85d4c18' : color + '15', color: chip.includes('缺失') ? '#e85d4c' : color }}
+                    >
+                      {chip}
+                    </motion.span>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </ExpandPanel>
+    </div>
+  );
+}
+
 function DauDashboardMock({ color }: { color: string }) {
   const { productName, metrics, stack } = companyContext;
-  const [activeNav, setActiveNav] = useState(0);
+  const [activeNav, setActiveNav] = useState<DashboardNavId>('overview');
   const [expanded, setExpanded] = useState<MetricId | null>(null);
-  const navItems = ['概览', '推送分析', '用户行为'];
+  const navItems: { id: DashboardNavId; label: string }[] = [
+    { id: 'overview', label: '概览' },
+    { id: 'push', label: '推送分析' },
+    { id: 'behavior', label: '用户行为' },
+  ];
 
   useEffect(() => {
-    const t = setTimeout(() => setActiveNav(1), 800);
+    const t = setTimeout(() => setActiveNav('push'), 800);
     return () => clearTimeout(t);
   }, []);
 
@@ -224,30 +343,42 @@ function DauDashboardMock({ color }: { color: string }) {
     <BrowserChrome title={`${stack.data} · ${productName} 数据看板`}>
       <div className="flex min-h-[140px]">
         <div className="w-[72px] shrink-0 border-r py-2" style={{ borderColor: '#eee', backgroundColor: '#fff' }}>
-          {navItems.map((n, i) => (
-            <motion.div key={n}
-              animate={{ backgroundColor: activeNav === i ? color + '22' : 'transparent', color: activeNav === i ? color : '#999' }}
-              className="px-2 py-1.5 text-[8px] font-bold">{n}</motion.div>
+          {navItems.map((nav) => (
+            <motion.button key={nav.id} type="button" onClick={() => setActiveNav(nav.id)}
+              animate={{ backgroundColor: activeNav === nav.id ? color + '22' : 'transparent', color: activeNav === nav.id ? color : '#999' }}
+              className="w-full px-2 py-1.5 text-[8px] font-bold text-left cursor-pointer">{nav.label}</motion.button>
           ))}
         </div>
         <div className="flex-1 p-2" style={{ backgroundColor: '#f7f8fa' }}>
-          <p className="text-[8px] font-bold mb-1.5" style={{ color: '#aaa' }}>推送分析 · 早报 09:30</p>
-          <div className="grid grid-cols-3 gap-1">
-            {cards.map((c, i) => (
-              <MetricCardButton key={c.id} {...c} expanded={expanded === c.id} color={color} index={i}
-                onClick={() => setExpanded((cur) => (cur === c.id ? null : c.id))} />
-            ))}
-          </div>
-          {!expanded && <CalloutPulse text="点任意指标卡片，展开白话解释" color={color} />}
-          <ExpandPanel show={expanded !== null}>
-            <div className="mt-2 pt-2 border-t" style={{ borderColor: color + '33' }}>
-              <AnimatePresence mode="wait">
-                <motion.div key={expanded} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>
-                  {expanded && <MetricDetailPanel id={expanded} color={color} />}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </ExpandPanel>
+          <p className="text-[8px] font-bold mb-1.5" style={{ color: '#aaa' }}>
+            {activeNav === 'behavior' ? '用户行为 · 推送设置页' : '推送分析 · 早报 09:30'}
+          </p>
+          <AnimatePresence mode="wait">
+            {activeNav === 'behavior' ? (
+              <motion.div key="behavior" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}>
+                <UserBehaviorPanel color={color} />
+              </motion.div>
+            ) : (
+              <motion.div key="push" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}>
+                <div className="grid grid-cols-3 gap-1">
+                  {cards.map((c, i) => (
+                    <MetricCardButton key={c.id} {...c} expanded={expanded === c.id} color={color} index={i}
+                      onClick={() => setExpanded((cur) => (cur === c.id ? null : c.id))} />
+                  ))}
+                </div>
+                {!expanded && <CalloutPulse text="点任意指标卡片，展开白话解释" color={color} />}
+                <ExpandPanel show={expanded !== null}>
+                  <div className="mt-2 pt-2 border-t" style={{ borderColor: color + '33' }}>
+                    <AnimatePresence mode="wait">
+                      <motion.div key={expanded} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}>
+                        {expanded && <MetricDetailPanel id={expanded} color={color} />}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                </ExpandPanel>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </BrowserChrome>
@@ -381,6 +512,15 @@ const VISUAL_MAP: Record<StepVisual['id'], (props: { color: string }) => ReactNo
     </BrowserChrome>
   ),
   'figma-workspace': FigmaWorkspaceMock,
+  'tech-oncall': TechOncallMock,
+  'ops-analytics': OpsAnalyticsMock,
+  'crm-pipeline': CrmPipelineMock,
+  'hr-ats': HrAtsMock,
+  'finance-expense': FinanceExpenseMock,
+  'legal-contract': LegalContractMock,
+  'mgmt-okr': MgmtOkrMock,
+  'support-tickets': SupportTicketMock,
+  'data-bi': DataBiMock,
 };
 
 export default function WorkMomentVisual({ visual, color }: WorkMomentVisualProps) {

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 interface ChoiceReflectionProps {
   thought: string;
@@ -8,124 +8,44 @@ interface ChoiceReflectionProps {
   onComplete: () => void;
 }
 
-export default function ChoiceReflection({ thought, teach, color, onComplete }: ChoiceReflectionProps) {
-  const [phase, setPhase] = useState<'invite' | 'thought' | 'teach'>('invite');
-  const hasTeach = Boolean(teach);
-
-  const advance = () => {
-    if (phase === 'thought' && hasTeach) {
-      setPhase('teach');
-      return;
-    }
-    onComplete();
-  };
+/** 选项后：猛兽派对风小面板弹一句，点一下或稍等继续 */
+export default function ChoiceReflection({ thought, color, onComplete }: ChoiceReflectionProps) {
+  useEffect(() => {
+    const t = window.setTimeout(onComplete, 2600);
+    return () => window.clearTimeout(t);
+  }, [onComplete]);
 
   return (
-    <div className="shrink-0 border-t-2 px-3 py-3 relative z-40" style={{ borderColor: color + '44', background: 'var(--pa-cream)' }}>
-      <AnimatePresence mode="wait">
-        {phase === 'invite' && (
-          <motion.div
-            key="invite"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-          >
-            <p className="text-[11px] font-bold leading-snug mb-2.5" style={{ color: '#555' }}>
-              刚才那句发出去啦……
-              <span style={{ color }}> 有人好像有话要说</span>
-              {hasTeach ? '（可能还不止一句）' : ''}
-            </p>
-            <div className="flex gap-2">
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setPhase('thought')}
-                className="flex-1 py-2.5 text-[12px] pa-btn pa-btn-height min-h-0"
-                style={{ background: `linear-gradient(175deg, ${color}cc 0%, ${color} 100%)`, borderColor: color, color: '#fff' }}
-              >
-                看看怎么个事 👀
-              </motion.button>
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onComplete}
-                className="flex-1 py-2.5 text-[12px] pa-btn pa-btn-cream pa-btn-height min-h-0"
-              >
-                不了，下一幕
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-
-        {phase === 'thought' && (
-          <motion.div
-            key="thought"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 26 }}
-          >
-            <div className="pa-panel p-3 mb-2.5" style={{ borderColor: color + '88' }}>
-              <p className="text-[13px] leading-relaxed font-semibold" style={{ color: 'var(--pa-dark)' }}>
-                {thought}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={advance}
-                className="flex-1 py-2.5 text-[12px] pa-btn pa-btn-height min-h-0"
-                style={{ background: `linear-gradient(175deg, ${color}cc 0%, ${color} 100%)`, borderColor: color, color: '#fff' }}
-              >
-                {hasTeach ? '还有？那再听一句' : '收功，下一幕 →'}
-              </motion.button>
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onComplete}
-                className="px-4 py-2.5 text-[12px] pa-btn pa-btn-cream pa-btn-height min-h-0 shrink-0"
-              >
-                溜了
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-
-        {phase === 'teach' && (
-          <motion.div
-            key="teach"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 26 }}
-          >
-            <div
-              className="pa-panel p-3 mb-2.5"
-              style={{ borderColor: 'var(--pa-gold)', background: 'linear-gradient(165deg, #fffef8 0%, #fff8e6 100%)' }}
-            >
-              <p className="text-[13px] leading-relaxed font-semibold" style={{ color: '#554' }}>
-                {teach}
-              </p>
-            </div>
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onComplete}
-              className="w-full py-2.5 text-[12px] pa-btn pa-btn-height min-h-0"
-              style={{ background: 'linear-gradient(175deg, #f0dfa8 0%, var(--pa-gold) 100%)', borderColor: 'var(--pa-gold-dark)' }}
-            >
-              收功，下一幕 →
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <motion.button
+      type="button"
+      aria-label="继续"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={onComplete}
+      className="absolute inset-0 z-50 flex items-center justify-center p-6 border-none cursor-pointer"
+      style={{ background: 'rgba(253, 250, 246, 0.72)' }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.82, y: 18, rotate: -2 }}
+        animate={{ opacity: 1, scale: 1, y: 0, rotate: -0.5 }}
+        exit={{ opacity: 0, scale: 0.92, y: 8 }}
+        transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+        className="pa-panel pa-panel-accent w-full max-w-[17.5rem] px-4 py-4 text-center"
+        style={{
+          borderColor: color,
+          boxShadow: `0 4px 0 ${color}99, 0 10px 24px rgba(74, 63, 53, 0.14)`,
+          background: 'linear-gradient(180deg, #fffefb 0%, var(--pa-cream) 100%)',
+        }}
+      >
+        <p
+          className="pa-title text-[14px] sm:text-[15px] leading-snug font-extrabold"
+          style={{ color: 'var(--pa-dark)' }}
+        >
+          {thought}
+        </p>
+      </motion.div>
+    </motion.button>
   );
 }

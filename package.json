@@ -11,7 +11,9 @@
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
-    "test:debug": "playwright test --debug"
+    "test:debug": "playwright test --debug",
+    "analytics:check": "node scripts/verify-analytics.mjs",
+    "analytics:setup": "node scripts/setup-analytics.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

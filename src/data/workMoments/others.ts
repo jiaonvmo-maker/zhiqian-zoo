@@ -21,10 +21,17 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 站会',
         phaseTip: '敏捷团队每天短会同步进度——别迟到，别讲太久。',
+        visual: {
+          id: 'tech-oncall',
+          hint: '点告警卡片',
+          caption: '技术日常另一半是 oncall：Sentry 里错误率、延迟、谁值班都能点开看——和真实救火一样。',
+        },
         jargon: [
           { term: '站会', plain: 'Daily Standup，站着开的小会，每人 1 分钟：昨天/今天/阻塞。' },
+          { term: '敏捷', plain: '一种靠短周期迭代、快速反馈交付的协作方式；站会是其中一例。' },
           { term: '迭代', plain: '一个开发周期，常见 1～2 周，到期要交付一批功能。' },
           { term: '需求单 / Story', plain: 'Jira/飞书上的任务卡，写清要做啥。' },
+          { term: 'block', plain: '被卡住了——站会必须说，不然别人以为你在摸鱼。' },
         ],
         pings: [
           { from: '柯基·需求又改了', text: '推送人群包接口今天能联调吗' },
@@ -56,6 +63,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '接口 / API', plain: '前后端约定的「数据格式」——像插座和插头，对不上就报错。' },
           { term: '联调', plain: '一起调试，看请求和返回对不对。' },
           { term: '字段', plain: 'JSON 里的 key，比如 userId、title。' },
+          { term: 'Swagger', plain: '接口文档工具——前后端看「约定发什么数据」的地方。' },
         ],
         pings: [
           { from: '哈士·Safari 又崩', text: '你这返回少个 pushTitle 我页面空白了' },
@@ -116,6 +124,8 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         jargon: [
           { term: '提测', plain: '开发说「做好了」，交给测试测。' },
           { term: 'P0 Bug', plain: '最高优先级缺陷，不修不能上线。' },
+          { term: '回归', plain: '改完再测一遍旧功能，防「修 A 坏 B」。' },
+          { term: '变更窗口', plain: '允许发版/改生产的时间段，窗外不能随便动。' },
           { term: '上线 / 发版', plain: '把新代码部署到生产环境。' },
         ],
         pings: [
@@ -146,8 +156,10 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         phaseTip: '线上挂了，oncall 工程师要响应。回滚往往比热修快。',
         jargon: [
           { term: 'oncall', plain: '轮值待命，告警来了要处理。' },
+          { term: 'PagerDuty', plain: '告警平台——线上挂了会打给你手机。' },
           { term: '502 / 500', plain: 'HTTP 错误码，用户看到「服务器错误」。' },
           { term: '回滚', plain: '恢复到上一个稳定版本。' },
+          { term: '热修', plain: '在线上直接改代码止血——风险高，通常不如先回滚。' },
         ],
         pings: [
           { from: 'PagerDuty', text: '🔴 生产 502' },
@@ -175,11 +187,12 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
     summary: {
       processRecap: '开发主线：领任务 → 实现接口/逻辑 → 联调对字段 → CR 改质量 → 测试通过 → 运维上线。线上故障 oncall 回滚。你不是「写代码的机器」，还要写文档、估时、沟通 block。',
       keyJargon: [
-        { term: '站会 / 迭代 / Story', plain: '每日同步；开发周期；任务卡' },
-        { term: '接口 / 联调 / 字段', plain: '前后端数据约定' },
+        { term: '站会 / 敏捷 / 迭代 / Story', plain: '每日同步；短周期协作；开发周期；任务卡' },
+        { term: 'block', plain: '被卡住，站会必须说清楚' },
+        { term: '接口 / 联调 / 字段 / Swagger', plain: '前后端数据约定与文档' },
         { term: 'CR / PR', plain: '代码评审与合并' },
-        { term: '提测 / P0 / 回归', plain: '交给测试；最高优 Bug；再测一遍' },
-        { term: '上线 / 回滚 / oncall', plain: '发版；版本恢复；值班救火' },
+        { term: '提测 / P0 / 回归 / 变更窗口', plain: '交给测试；最高优 Bug；再测；可发版时段' },
+        { term: '上线 / 回滚 / oncall / PagerDuty / 热修', plain: '发版；恢复；值班；告警；线上直改' },
       ],
       selfCheck: ['逻辑题/细节错漏你能忍吗？', '需求一周改四次，你会崩吗？', '愿意晚上被叫起来修 Bug 吗？'],
       verdictHint: '喜欢「做出来能跑」、逻辑强、能抗压，适合开发。若讨厌变更、讨厌沟通，可先试测试或数据（离代码近但不同节奏）。',
@@ -205,10 +218,17 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 看数据 & 竞品',
         phaseTip: '运营不是凭感觉发内容——先看昨天那条咋样，再看别人咋做的。',
+        visual: {
+          id: 'ops-analytics',
+          hint: '点指标卡片',
+          caption: '运营后台里曝光、点击率、转化都能点开：先看掉在哪，再决定改封面还是改 CTA。',
+        },
         jargon: [
           { term: '阅读/曝光', plain: '多少人看到了你的笔记/帖子。' },
+          { term: '点击率', plain: 'Click-Through Rate，看到的人里有多少点进去了。' },
           { term: '转化', plain: '看到之后有没有点击、购买、注册——各公司定义不同。' },
           { term: '种草', plain: '让用户「想买/想试」，不一定当场下单。' },
+          { term: 'CTA', plain: 'Call To Action，「点链接下单」「私信领券」这类行动引导。' },
         ],
         pings: [
           { from: '数据群', text: '昨日笔记阅读 1.2w，点击率 3.1%，低于均值' },
@@ -237,7 +257,9 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         phase: '② 出方案',
         phaseTip: '方案要写清：目标、人群、内容形式、预算、怎么验收。',
         jargon: [
-          { term: 'KPI', plain: '考核指标，比如阅读量、涨粉、GMV。' },
+          { term: 'KPI', plain: 'Key Performance Indicator，考核指标，比如阅读量、涨粉。' },
+          { term: 'GMV', plain: 'Gross Merchandise Volume，成交总额——用户买了多少钱的货。' },
+          { term: '硬广', plain: '直白推销的广告味内容，对比「软种草」更销售导向。' },
           { term: '调性', plain: '品牌气质——高级/可爱/专业，不能乱。' },
           { term: 'AB 测试', plain: '两版内容比哪个好。' },
         ],
@@ -270,7 +292,6 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         jargon: [
           { term: 'ROI', plain: '投入产出比，投 1 块赚几块。' },
           { term: '投放 / 投流', plain: '花钱买曝光，不是每条内容都能投。' },
-          { term: 'CTA', plain: 'Call To Action，「点击购买」「私信领」这类引导。' },
         ],
         pings: [
           { from: '品牌 Lisa', text: '第三版还是太 sales 了' },
@@ -301,6 +322,8 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '投流', plain: '给内容加预算买推荐。' },
           { term: '完读率', plain: '内容读完了的比例，视频尤其看这个。' },
           { term: '归因', plain: '这笔成交算谁拉的——运营常踩坑。' },
+          { term: '全链路', plain: '从曝光到站外下单整条路径都算，不只看站内阅读。' },
+          { term: 'OKR', plain: 'Objectives & Key Results，目标与关键结果，用来对齐「这季考核什么」。' },
         ],
         pings: [
           { from: '数据群', text: '站内阅读 OK，天猫进店 +15%，GMV 在电商那边' },
@@ -328,9 +351,12 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
     summary: {
       processRecap: '运营主线：数据诊断 → 方案（目标/KPI/形式）→ 跨部门改稿 → 发布盯评 → 复盘归因。小厂常一人全包：内容+投放+社群+店铺。',
       keyJargon: [
-        { term: '种草 / 转化 / GMV', plain: '种草；下一步动作；成交总额' },
-        { term: '调性 / KPI / ROI', plain: '品牌感；考核；投入产出' },
-        { term: 'AB / 投流 / 归因', plain: '对比测试；买量；业绩算谁的' },
+        { term: 'GMV', plain: '成交总额，电商最爱问的数' },
+        { term: '种草 / 转化', plain: '让人想买；促使其点击/下单' },
+        { term: 'KPI / OKR', plain: '考核指标；目标与关键结果' },
+        { term: '调性 / 硬广', plain: '品牌气质；直白推销味' },
+        { term: 'ROI / 投流 / 归因', plain: '投入产出；买量；业绩算谁的' },
+        { term: '全链路', plain: '站内到站外整条转化路径' },
       ],
       selfCheck: ['能连续改五版稿子吗？', '品牌与电商打架时你能协调吗？', '数据不好时扛得住吗？'],
       verdictHint: '爱内容、爱热点、能扯皮能复盘，运营合适。若只想安静写作，可考虑编辑/文案岗（边界更窄）。',
@@ -356,6 +382,11 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 盘客户',
         phaseTip: '销售早上常看 CRM：谁该跟、谁快签、谁要凉了。',
+        visual: {
+          id: 'crm-pipeline',
+          hint: '点阶段卡片',
+          caption: 'CRM Pipeline 里线索、报价、风险单都能点：销售开盘不是瞎打电话，是排优先级。',
+        },
         jargon: [
           { term: 'Pipeline', plain: '潜在客户清单和阶段——线索/意向/报价/签约。' },
           { term: 'CRM', plain: '客户关系系统，记录谁跟进了啥。' },
@@ -389,6 +420,8 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         phaseTip: 'demo = 演示产品。客户问的不只是功能，还有「比竞品好在哪」。',
         jargon: [
           { term: 'demo', plain: '产品演示，现场或线上。' },
+          { term: 'ToB', plain: 'To Business，对企业客户销售（对比 ToC 面向个人用户）。' },
+          { term: 'case', plain: '成功案例——同行业客户怎么用、效果如何，比讲参数更管用。' },
           { term: '聚光 / 蒲公英', plain: '小红书广告/达人产品名，销售要会讲。' },
           { term: '方案', plain: '针对客户的投放/合作计划，常要定制。' },
         ],
@@ -450,6 +483,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         phaseTip: '签完不是结束——回款、续约、客诉都还可能找你。',
         jargon: [
           { term: '回款', plain: '客户把钱打过来，销售常背这个 KPI。' },
+          { term: 'KPI', plain: '考核指标——销售常见：回款额、签约数、新客数。' },
           { term: '客单价', plain: '一单平均多少钱。' },
           { term: '续约', plain: '老客户第二年还签不签。' },
         ],
@@ -479,8 +513,8 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       processRecap: 'ToB 销售：维护 Pipeline → 拜访/demo → 定制方案 → 协调法务运营 → 谈判签约 → 回款续约。核心是信任与解决问题，不是背产品参数。',
       keyJargon: [
         { term: 'Pipeline / CRM / KA', plain: '客户池；客户系统；大客户' },
-        { term: 'demo / 方案 / case', plain: '演示；合作计划；成功案例' },
-        { term: '返点 / 回款 / 续约', plain: '利润返还；收钱；续签' },
+        { term: 'ToB / demo / 方案 / case', plain: '对企业销售；演示；合作计划；成功案例' },
+        { term: '返点 / 回款 / KPI / 续约', plain: '利润返还；收钱；考核；续签' },
       ],
       selfCheck: ['被拒绝十次还能打第十一通电话吗？', '能同时哄客户和内部同事吗？', '月底 KPI 压顶扛得住吗？'],
       verdictHint: '外向、抗压、目标感强，销售能赚大钱也苦。若讨厌 KPI，可看售前/客户成功（签后服务，节奏不同）。',
@@ -506,6 +540,11 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 筛简历',
         phaseTip: '业务说「要资深的」，预算给「能招实习生的」——HR 第一天就要学会问清 HC。',
+        visual: {
+          id: 'hr-ats',
+          hint: '点漏斗层',
+          caption: '招聘系统里投递→约面→Offer 一层层筛：HC/JD 没对齐，筛再久也对不上。',
+        },
         jargon: [
           { term: 'HC', plain: 'Headcount，编制名额，招几个、什么级别。' },
           { term: 'JD', plain: 'Job Description，招聘岗位说明。' },
@@ -540,6 +579,8 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '业务面', plain: '用人部门面试，看专业能力。' },
           { term: 'HR 面', plain: '看动机、薪资预期、稳定性。' },
           { term: '背调', plain: 'Background Check，核实学历、工作经历。' },
+          { term: 'hiring manager', plain: '用人经理——业务线真正拍板要谁的人，跟他对齐标准最重要。' },
+          { term: '带宽 / bandwidth', plain: '这个职级能开的薪资区间；谈薪前要心里有数。' },
         ],
         pings: [
           { from: '候选人', text: '贵司加班多吗 我还有别家 offer' },
@@ -558,7 +599,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
             youSay: '从不加班 发展无限',
             reply: { from: '候选人', text: '（上网一搜）……' },
             thought: '候选人也会查 Glassdoor/小红书。诚实长久。',
-            teach: '过度承诺 → 入职三个月离职，算 HR 招聘质量差。',
+            teach: 'Glassdoor 等雇主评价站候选人常会查。过度承诺 → 入职三个月离职，算 HR 招聘质量差。',
             next: 2,
           },
         ],
@@ -570,6 +611,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: 'offer', plain: '录用通知书，含岗位、薪资、入职日。' },
           { term: '职级', plain: 'P5/M3 这类，影响薪资带宽。' },
           { term: 'onboarding', plain: '入职培训、领设备、办手续。' },
+          { term: 'KPI', plain: '考核指标——招聘常见：到岗时效、新人留存、体验评价。' },
         ],
         pings: [
           { from: '系统', text: '候选人接受 offer 入职日下周一' },
@@ -596,7 +638,8 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       processRecap: '招聘 HR：对齐 HC/JD → 筛简历 → 安排面试 → 谈薪发 offer → onboarding。还有绩效、考勤、员工关系等模块，小 HR 全包。',
       keyJargon: [
         { term: 'HC / JD / 漏斗', plain: '编制；岗位说明；筛选流程' },
-        { term: 'offer / 背调 / 职级', plain: '录用；背景调查；级别' },
+        { term: 'hiring manager / 带宽', plain: '用人业务经理；薪资区间' },
+        { term: 'offer / 背调 / 职级 / KPI', plain: '录用；背景调查；级别；考核' },
         { term: 'onboarding', plain: '入职流程' },
       ],
       selfCheck: ['能一天聊八个候选人还不虚吗？', '业务催、候选人问，你能两边安抚吗？', '对细节（合同、日期）耐心吗？'],
@@ -623,6 +666,11 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 审报销',
         phaseTip: '每张票要看：抬头、税号、金额、是否超预算、有没有合同。',
+        visual: {
+          id: 'finance-expense',
+          hint: '点单据卡片',
+          caption: '费控系统里抬头异常、超预算、三单匹配都能点——财务说「退回」通常有硬规则，不是故意刁难。',
+        },
         jargon: [
           { term: '发票抬头', plain: '发票上的公司名，必须跟报销主体一致。' },
           { term: '预算', plain: '这部门今年能花多少钱，超了要特批。' },
@@ -657,6 +705,9 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
           { term: '关账', plain: '月度结账，此后这月账不能随便改。' },
           { term: 'P&L', plain: 'Profit & Loss，利润表，赚没赚钱。' },
           { term: '现金流', plain: '钱进进出出，比利润更生死。' },
+          { term: 'CFO', plain: 'Chief Financial Officer，首席财务官——管钱和报表最终拍板的人。' },
+          { term: '审计', plain: '外部/内部核查账务是否真实合规，错票、随意调账都可能被追责。' },
+          { term: 'IPO', plain: '首次公开募股上市——届时财务历史会被翻个底朝天。' },
         ],
         pings: [
           { from: 'CFO', text: '这月费用超预算的部门列表今天出' },
@@ -684,6 +735,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       keyJargon: [
         { term: '发票抬头 / 预算 / 三单匹配', plain: '开票名；花钱额度；合同票验收一致' },
         { term: '关账 / P&L / 现金流', plain: '月结；利润表；钱进出' },
+        { term: 'CFO / 审计 / IPO', plain: '财务一把手；账务核查；上市' },
       ],
       selfCheck: ['差一分钱对不上能接受吗？', '能礼貌拒绝不合规报销吗？', '月底加班 OK 吗？'],
       verdictHint: '细心、守规则、对数字不犯困，财务稳。若只想分析不想审票，目标财务 BP/分析岗（路不同）。',
@@ -708,10 +760,16 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 审合同',
         phaseTip: '重点看：责任谁担、知识产权归谁、数据怎么用、争议在哪仲裁。',
+        visual: {
+          id: 'legal-contract',
+          hint: '点条款卡片',
+          caption: '审合同界面重点盯无限责任、知识产权、管辖：标红不是找茬，是拦会炸的条款。',
+        },
         jargon: [
           { term: '违约责任', plain: '做不到赔多少、怎么赔。' },
           { term: '知识产权', plain: '成果归谁，尤其定制开发。' },
           { term: '管辖', plain: '打官司去哪个法院/仲裁。' },
+          { term: '风险确认书', plain: '业务坚持要签高风险条款时，负责人签字认账，法务留档——英文常叫 risk acceptance。' },
         ],
         pings: [
           { from: '狮子·再飞一趟', text: '客户今晚要签！！合同能过吗' },
@@ -796,8 +854,15 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 接目标',
         phaseTip: 'CEO 说的「翻倍」「降本」要翻译成团队能执行的 OKR。',
+        visual: {
+          id: 'mgmt-okr',
+          hint: '点目标卡片',
+          caption: 'OKR 看板上营收目标、成本 KR、对齐度都能点：管理层日常就是拆口号、谈资源、逼取舍。',
+        },
         jargon: [
           { term: 'OKR', plain: 'Objectives & Key Results，目标与关键结果，对齐用。' },
+          { term: 'KR', plain: 'Key Result，关键结果——必须可衡量，写不出 KR 的目标是口号。' },
+          { term: 'KPI', plain: '考核指标，常用来衡量 OKR 是否达成。' },
           { term: 'P&L', plain: 'Profit & Loss，这块业务赚没赚钱，你背。' },
           { term: '对齐', plain: '确保上下对「要什么」理解一致。' },
         ],
@@ -818,7 +883,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
             label: '私下对齐再上会',
             youSay: '（私聊 CFO）数字咱先对齐？',
             thought: '会前通气减少当众翻车。',
-            teach: '管理不是赌勇气，是赌信息充分。',
+            teach: 'CFO = 首席财务官。管理不是赌勇气，是赌信息充分。',
             next: 1,
           },
         ],
@@ -827,9 +892,12 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         phase: '② 协调与拍板',
         phaseTip: '产品、研发、运营抢资源——你要拍优先级，不可能全满足。',
         jargon: [
+          { term: 'HC', plain: 'Headcount，编制名额——能招几个、什么级别。' },
           { term: '资源', plain: '人、钱、时间——永远不够。' },
           { term: '优先级', plain: '先做什么后做什么，管理者核心工作。' },
+          { term: 'scope', plain: '范围：这期功能做多大；砍 scope = 少做一点好交付。' },
           { term: '1:1', plain: '一对一沟通，管人必备。' },
+          { term: 'VP', plain: 'Vice President，副总裁，通常管一条业务线。' },
         ],
         pings: [
           { from: '产品 VP', text: '不加人做不了' },
@@ -856,9 +924,10 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
     summary: {
       processRecap: '管理者：接战略 → 拆 OKR → 配资源 → 盯执行 → 对 P&L 负责。不是「职位高了就轻松」，是责任换了形态。',
       keyJargon: [
-        { term: 'OKR / KPI', plain: '目标体系；考核指标' },
+        { term: 'OKR / KR / KPI', plain: '目标；关键结果；考核指标' },
+        { term: 'HC', plain: '编制名额（能招几个人）' },
         { term: 'P&L', plain: '盈亏责任' },
-        { term: '对齐 / 优先级 / 1:1', plain: '共识；取舍；管人' },
+        { term: '对齐 / 优先级 / scope / 1:1', plain: '共识；取舍；范围；管人' },
       ],
       selfCheck: ['团队做不好你扛吗？', '能在信息不全时拍板吗？', '愿意大量开会协调吗？'],
       verdictHint: '管理岗通常从专业岗做起来，不是毕业第一条路。先在一个领域扎深，再考虑带团队。',
@@ -883,10 +952,16 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '① 接首单',
         phaseTip: 'SLA 规定多久必须首响——超时扣绩效。',
+        visual: {
+          id: 'support-tickets',
+          hint: '点工单卡片',
+          caption: '客服工作台里排队、剩余秒数、问题标签都能点：首响要抢，回完还得打标才能升级。',
+        },
         jargon: [
           { term: 'SLA', plain: 'Service Level Agreement，服务时效，如 90 秒内响应。' },
           { term: '工单', plain: 'Ticket，一条问题一个号，全程可追溯。' },
           { term: '首响', plain: '第一次回复用户的时间。' },
+          { term: 'KPI', plain: '考核指标——客服常见：首响时效、满意度、解决率。' },
         ],
         pings: [
           { from: '用户A', text: '我笔记怎么不见了！！！' },
@@ -943,7 +1018,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
     summary: {
       processRecap: '客服主线：队列接单 → 按 SLA 响应 → 查因/升级 → 闭环工单。是用户情绪的缓冲垫，也是产品问题的晴雨表。',
       keyJargon: [
-        { term: 'SLA / 工单 / 首响', plain: '时效；问题单；首次回复' },
+        { term: 'SLA / 工单 / 首响 / KPI', plain: '时效；问题单；首次回复；考核' },
         { term: '限流 / 申诉 / 客诉', plain: '展示变少；复审；投诉' },
       ],
       selfCheck: ['被骂还能保持礼貌吗？', '重复问题百遍还不烦吗？', '能接受排班和 KPI 吗？'],
@@ -970,7 +1045,9 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         phase: '① 接需求',
         phaseTip: '先问：指标定义？时间范围？跟上次一样吗？——不问清楚必返工。',
         jargon: [
-          { term: '口径', plain: '指标怎么算，如 DAU 算不算游客。' },
+          { term: '口径', plain: '指标怎么算，比如「日活」算不算游客账号。' },
+          { term: 'DAU', plain: 'Daily Active Users，日活跃用户数——每天打开 App 的人数。' },
+          { term: 'cohort', plain: '同一批用户按时间看变化，如「1 月 1 日注册的人次日还来吗」。' },
           { term: '埋点', plain: 'App 里埋代码上报用户行为，没埋就没数。' },
           { term: '需求单', plain: '谁要什么数、啥时候要、用来干啥。' },
         ],
@@ -998,10 +1075,16 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
       {
         phase: '② 取数 & 发现',
         phaseTip: 'SQL 从数仓查数据。埋点挂了、字段空，是日常。',
+        visual: {
+          id: 'data-bi',
+          hint: '点模块卡片',
+          caption: 'BI 看板里 SQL 状态、刷新延迟、Cohort 都能点：数据分析不是「要个数」，是先对齐口径再出结论。',
+        },
         jargon: [
           { term: 'SQL', plain: '查数据库的语言，分析师必备。' },
           { term: '数仓', plain: '存历史数据的地方，比业务库全。' },
           { term: 'BI / 看板', plain: '可视化报表，RedBI、Tableau 等。' },
+          { term: 'partial', plain: '部分结论——数据不全时先给可用的，并标明缺什么。' },
         ],
         pings: [
           { from: '你', text: '……push_click 字段又是空的' },
@@ -1031,6 +1114,7 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
         phaseTip: '老板要「直观」——一张总览 + 口头讲三层：结论、原因、建议。',
         jargon: [
           { term: '漏斗', plain: '步骤流失，如浏览→点击→购买。' },
+          { term: '留存', plain: '用户今天来了，之后还来吗？分析师常配合 cohort 看。' },
           { term: '归因', plain: '为啥掉了，是渠道、产品还是季节。' },
           { term: 'A/B', plain: '对比实验看哪个方案好。' },
         ],
@@ -1058,9 +1142,10 @@ export const workMomentsOthers: Record<string, WorkMoment> = {
     summary: {
       processRecap: '数据分析主线：澄清需求/口径 → SQL 取数 → 分析归因 → 可视化 → 汇报推动落地。埋点、数仓、业务理解三块缺一不可。',
       keyJargon: [
-        { term: '口径 / 埋点 / cohort', plain: '怎么算；行为上报；用户群追踪' },
+        { term: 'DAU', plain: '日活跃用户数' },
+        { term: '口径 / 埋点 / cohort', plain: '怎么算；行为上报；用户群随时间追踪' },
         { term: 'SQL / 数仓 / BI', plain: '查数；数据仓库；看板' },
-        { term: '漏斗 / 归因 / A/B', plain: '流失；原因；实验' },
+        { term: '漏斗 / 留存 / 归因 / A/B', plain: '流失；回头；原因；实验' },
       ],
       selfCheck: ['愿意学 SQL 吗？', '业务催数时能坚持口径吗？', '能把数字讲成故事吗？'],
       verdictHint: '逻辑好、对数字敏感、愿意沟通，数据分析值得试。可先学 SQL+Excel，实习验证喜不喜欢。',

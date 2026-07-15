@@ -37,5 +37,5 @@ export function companyBrief(): string {
 /** 当前需求一句话 — 挂在小抄/群聊上下文 */
 export function sprintOneLiner(): string {
   const { currentSprint, metrics } = companyContext;
-  return `「${currentSprint.name}」：${currentSprint.goal}（DAU ${metrics.dau}，${metrics.problem}）`;
+  return `「${currentSprint.name}」：${currentSprint.goal}（日活 ${metrics.dau}，${metrics.problem}）`;
 }

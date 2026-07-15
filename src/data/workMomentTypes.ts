@@ -50,7 +50,19 @@ export interface MomentChoice {
 }
 
 /** 动效示意图 ID — 组件内实现对应 mock UI */
-export type StepVisualId = 'dau-dashboard' | 'push-funnel' | 'figma-workspace';
+export type StepVisualId =
+  | 'dau-dashboard'
+  | 'push-funnel'
+  | 'figma-workspace'
+  | 'tech-oncall'
+  | 'ops-analytics'
+  | 'crm-pipeline'
+  | 'hr-ats'
+  | 'finance-expense'
+  | 'legal-contract'
+  | 'mgmt-okr'
+  | 'support-tickets'
+  | 'data-bi';
 
 export interface StepVisual {
   id: StepVisualId;

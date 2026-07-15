@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { departments } from '@/data/departments';
@@ -10,6 +10,7 @@ import CyberBadge from './CyberBadge';
 import PrivateChat from './PrivateChat';
 import FluffyAvatar from './FluffyAvatar';
 import { defaultAvatar } from '@/data/partyAnimalsAssets';
+import { AnalyticsEvents, track } from '@/analytics';
 
 export default function DepartmentChat() {
   const { selectedDept, selectDepartment, showBadge, addNotification } = useGameStore();
@@ -26,18 +27,14 @@ export default function DepartmentChat() {
   const revealCleanupRef = useRef<(() => void) | null>(null);
 
   const dept = departments.find((d) => d.id === selectedDept);
+  const deptNpcs = useMemo(() => dept ? npcs.filter((n) => n.departmentId === dept.id) : [], [dept]);
 
   useEffect(() => {
-    if (!dept) return;
-
-    setMessages([]);
-    setHistoryReady(false);
-
-    const script = generateChatScript(dept.id);
-    if (script.length === 0) {
-      setHistoryReady(true);
+    if (!dept) {
       return;
     }
+
+    const script = generateChatScript(dept.id);
 
     let cancelled = false;
     let idx = 0;
@@ -49,29 +46,44 @@ export default function DepartmentChat() {
     };
     revealCleanupRef.current = clearAll;
 
-    const revealNext = () => {
-      if (cancelled || idx >= script.length) {
-        if (!cancelled) setHistoryReady(true);
-        return;
-      }
+    // Initialize messages asynchronously to avoid setState in effect
+    const initAndReveal = () => {
+      if (cancelled) return;
 
-      const next = script[idx];
-      setMessages((prev) => [...prev, next]);
-      idx += 1;
-      if (idx >= script.length) {
+      setMessages([]);
+      setHistoryReady(false);
+
+      if (script.length === 0) {
         setHistoryReady(true);
         return;
       }
-      timeouts.push(setTimeout(revealNext, 480));
+
+      const revealNext = () => {
+        if (cancelled || idx >= script.length) {
+          if (!cancelled) setHistoryReady(true);
+          return;
+        }
+
+        const next = script[idx];
+        setMessages((prev) => [...prev, next]);
+        idx += 1;
+        if (idx >= script.length) {
+          setHistoryReady(true);
+          return;
+        }
+        timeouts.push(setTimeout(revealNext, 480));
+      };
+
+      timeouts.push(setTimeout(revealNext, 300));
     };
 
-    timeouts.push(setTimeout(revealNext, 300));
+    timeouts.push(setTimeout(initAndReveal, 0));
 
     return () => {
       clearAll();
       revealCleanupRef.current = null;
     };
-  }, [dept?.id]);
+  }, [dept]);
 
   const skipHistory = () => {
     if (!dept || historyReady) return;
@@ -79,11 +91,71 @@ export default function DepartmentChat() {
     revealCleanupRef.current = null;
     setMessages(generateChatScript(dept.id));
     setHistoryReady(true);
+    track(AnalyticsEvents.CHAT_HISTORY_SKIP, {
+      dept_id: dept.id,
+      messages_skipped: Math.max(0, generateChatScript(dept.id).length - messages.length),
+    }, 'department');
   };
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
+
+  const handleSend = useCallback((text: string, inputType: 'text' | 'quick_reply' = 'text') => {
+    if (!historyReady || !dept) return;
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    track(AnalyticsEvents.CHAT_MESSAGE_SEND, {
+      dept_id: dept.id,
+      input_type: inputType,
+      message_length: trimmed.length,
+    }, 'department');
+
+    // Generate timestamp and random values once at the start of the handler
+    const now = Date.now();
+    const randomIndex = Math.floor(Math.random() * deptNpcs.length);
+
+    const userMsg: import('@/types').ChatMessage = {
+      id: `user-${msgIdRef.current++}`,
+      npcId: 'user',
+      text: trimmed,
+      timestamp: now,
+      isUser: true,
+    };
+    setMessages((prev) => [...prev, userMsg]);
+    setInputText('');
+
+    const responder = deptNpcs[randomIndex];
+    if (responder) {
+      const reply = getNPCReply(responder.id, trimmed);
+      setMessages((prev) => [...prev, {
+        id: `reply-${msgIdRef.current++}`,
+        npcId: responder.id,
+        text: reply.text,
+        timestamp: Date.now(),
+        mood: reply.mood,
+      }]);
+    }
+
+    addNotification({ id: `n-${now}`, type: 'social', title: `${dept.name}群聊`, message: `你在${dept.name}发了一条消息`, timestamp: now, read: false });
+  }, [historyReady, dept, deptNpcs, addNotification]);
+
+  const handleReaction = (msgId: string, reaction: string) => {
+    setReactions((prev) => ({ ...prev, [msgId]: [...(prev[msgId] || []), reaction] }));
+    setShowReactionPicker(null);
+  };
+
+  const moodBorders: Record<string, string> = {
+    angry: '2px solid #ff6b6b',
+    tired: '2px solid #c7ceea',
+    normal: '2px solid #eee',
+    energetic: '2px solid #a8e6cf',
+    strict: '2px solid #ffe66d',
+    sneaky: '2px solid #c7ceea',
+    happy: '2px solid #a8e6cf',
+    surprised: '2px solid #c7ceea',
+  };
 
   if (!dept) {
     return (
@@ -99,54 +171,7 @@ export default function DepartmentChat() {
     );
   }
 
-  const deptNpcs = npcs.filter((n) => n.departmentId === dept.id);
   const quickReplies = QUICK_REPLIES[dept.id] || ['收到', '在做了', '马上好'];
-
-  const moodBorders: Record<string, string> = {
-    angry: '2px solid #ff6b6b',
-    tired: '2px solid #c7ceea',
-    normal: '2px solid #eee',
-    energetic: '2px solid #a8e6cf',
-    strict: '2px solid #ffe66d',
-    sneaky: '2px solid #c7ceea',
-    happy: '2px solid #a8e6cf',
-    surprised: '2px solid #c7ceea',
-  };
-
-  const handleSend = (text: string) => {
-    if (!historyReady) return;
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    const userMsg: import('@/types').ChatMessage = {
-      id: `user-${msgIdRef.current++}`,
-      npcId: 'user',
-      text: trimmed,
-      timestamp: Date.now(),
-      isUser: true,
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setInputText('');
-
-    const responder = deptNpcs[Math.floor(Math.random() * deptNpcs.length)];
-    if (responder) {
-      const reply = getNPCReply(responder.id, trimmed);
-      setMessages((prev) => [...prev, {
-        id: `reply-${msgIdRef.current++}`,
-        npcId: responder.id,
-        text: reply.text,
-        timestamp: Date.now(),
-        mood: reply.mood,
-      }]);
-    }
-
-    addNotification({ id: `n-${Date.now()}`, type: 'social', title: `${dept.name}群聊`, message: `你在${dept.name}发了一条消息`, timestamp: Date.now(), read: false });
-  };
-
-  const handleReaction = (msgId: string, reaction: string) => {
-    setReactions((prev) => ({ ...prev, [msgId]: [...(prev[msgId] || []), reaction] }));
-    setShowReactionPicker(null);
-  };
-
   const reactionIcons = ['👍', '😂', '🔥', '💀', '🎉', '❤️'];
 
   return (
@@ -278,7 +303,7 @@ export default function DepartmentChat() {
               transition={{ delay: i * 0.05 }}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => handleSend(reply)}
+              onClick={() => handleSend(reply, 'quick_reply')}
               className="pa-tag whitespace-nowrap shrink-0 px-4 py-2 text-xs pa-btn-height"
             >
               {reply}
@@ -369,7 +394,7 @@ export default function DepartmentChat() {
       <AnimatePresence>{showBadge && <CyberBadge />}</AnimatePresence>
       <AnimatePresence>
         {tryWork && getWorkMoment(dept.id) && (
-          <WorkMomentModal moment={getWorkMoment(dept.id)!} color={dept.color} onClose={() => setTryWork(false)} />
+          <WorkMomentModal moment={getWorkMoment(dept.id)!} color={dept.color} source="department_chat" onClose={() => setTryWork(false)} />
         )}
       </AnimatePresence>
     </div>

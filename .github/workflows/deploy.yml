@@ -34,6 +34,9 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_PATH: /zhiqian-zoo/
+          VITE_ANALYTICS_ENDPOINT: https://webhook.site/16afb4a2-3919-4805-bb4f-5928d9dc2585
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ secrets.VITE_POSTHOG_HOST }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

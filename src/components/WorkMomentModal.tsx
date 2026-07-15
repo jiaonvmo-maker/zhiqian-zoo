@@ -1,7 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { WorkMoment } from '@/data/workMomentTypes';
+import { AnalyticsEvents, track } from '@/analytics';
+import { useGameStore } from '@/store/gameStore';
 import {
   StepKnowledgePanel,
   IntroToolsPanel,
@@ -23,10 +25,12 @@ type Screen = 'intro' | 'playing' | 'ended';
 interface WorkMomentModalProps {
   moment: WorkMoment;
   color: string;
+  source?: string;
   onClose: () => void;
 }
 
-export default function WorkMomentModal({ moment, color, onClose }: WorkMomentModalProps) {
+export default function WorkMomentModal({ moment, color, source = 'unknown', onClose }: WorkMomentModalProps) {
+  const markWorkMomentComplete = useGameStore((s) => s.markWorkMomentComplete);
   const [screen, setScreen] = useState<Screen>('intro');
   const [stepIdx, setStepIdx] = useState(0);
   const [log, setLog] = useState<ChatLine[]>([]);
@@ -37,10 +41,41 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
   const currentStep = moment.steps[stepIdx];
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const playTopRef = useRef<HTMLDivElement>(null);
+  const openedAtRef = useRef(Date.now());
+  const completedRef = useRef(false);
+
+  useEffect(() => {
+    track(AnalyticsEvents.WORK_MOMENT_OPEN, {
+      dept_id: moment.deptId,
+      title: moment.title,
+      source,
+      step_count: moment.steps.length,
+    });
+  }, [moment.deptId, moment.title, moment.steps.length, source]);
+
+  const handleClose = useCallback(() => {
+    if (!completedRef.current) {
+      track(AnalyticsEvents.WORK_MOMENT_ABANDON, {
+        dept_id: moment.deptId,
+        source,
+        last_step_index: stepIdx,
+        progress_pct: Math.round((stepIdx / Math.max(totalSteps, 1)) * 100),
+        dwell_ms: Date.now() - openedAtRef.current,
+      });
+    }
+    onClose();
+  }, [moment.deptId, onClose, source, stepIdx, totalSteps]);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+  }, []);
+
+  const scrollToPlayTop = useCallback(() => {
+    requestAnimationFrame(() => {
+      playTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }, []);
 
@@ -50,8 +85,10 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
     setReflection(null);
     setLog((prev) => [...prev, ...step.pings.map((p) => ({ from: p.from, text: p.text }))]);
     setWaitingChoice(true);
-    scrollToBottom();
-  }, [moment.steps, scrollToBottom]);
+    // 有实景示意时先停在顶部，别一上来滚到聊天底把看板藏掉
+    if (step.visual) scrollToPlayTop();
+    else scrollToBottom();
+  }, [moment.steps, scrollToBottom, scrollToPlayTop]);
 
   const completeReflection = useCallback(() => {
     if (!reflection) return;
@@ -62,13 +99,22 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
       pushPings(nextIdx);
     } else {
       setScreen('ended');
+      completedRef.current = true;
+      markWorkMomentComplete(moment.deptId);
+      track(AnalyticsEvents.WORK_MOMENT_COMPLETE, {
+        dept_id: moment.deptId,
+        source,
+        step_count: moment.steps.length,
+        dwell_ms: Date.now() - openedAtRef.current,
+      });
     }
-  }, [reflection, pushPings]);
+  }, [reflection, pushPings, moment.deptId, moment.steps.length, source, markWorkMomentComplete]);
 
   const startDay = () => {
     setScreen('playing');
     setStepIdx(0);
     setLog([]);
+    track(AnalyticsEvents.WORK_MOMENT_START, { dept_id: moment.deptId, source });
     setTimeout(() => pushPings(0), 400);
   };
 
@@ -113,7 +159,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pa-overlay"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <motion.div
         initial={{ y: 40, opacity: 0 }}
@@ -132,7 +178,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
                 : `${moment.role} · 第 ${Math.min(stepIdx + 1, totalSteps)}/${totalSteps} 段`}
             </p>
           </div>
-          <motion.button type="button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="pa-icon-btn w-9 h-9 shrink-0">
+          <motion.button type="button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleClose} className="pa-icon-btn w-9 h-9 shrink-0">
             <X size={16} style={{ color: 'var(--pa-orange)' }} />
           </motion.button>
         </div>
@@ -193,7 +239,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
 
             {screen === 'playing' && currentStep && (
               <motion.div key="play" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <div className="pa-panel px-3 py-2 mb-2" style={{ borderColor: color }}>
+                <div ref={playTopRef} className="pa-panel px-3 py-2 mb-2" style={{ borderColor: color }}>
                   <p className="text-[11px] font-extrabold" style={{ color }}>{currentStep.phase}</p>
                   <p className="text-[10px] leading-snug mt-0.5" style={{ color: '#666' }}>{currentStep.phaseTip}</p>
                 </div>
@@ -209,6 +255,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
                   legacyJargon={currentStep.jargon}
                   color={color}
                   showCompanyChip
+                  defaultOpen={!currentStep.visual}
                 />
 
                 <p className="text-[9px] text-center font-bold py-1" style={{ color: '#aaa' }}>— 群消息 —</p>
@@ -258,7 +305,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
                   </p>
                 </div>
 
-                <motion.button type="button" whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={onClose} className="w-full py-3 text-sm pa-btn pa-btn-cream pa-btn-height">
+                <motion.button type="button" whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={handleClose} className="w-full py-3 text-sm pa-btn pa-btn-cream pa-btn-height">
                   换别的部门再体验一天
                 </motion.button>
               </motion.div>
@@ -268,7 +315,7 @@ export default function WorkMomentModal({ moment, color, onClose }: WorkMomentMo
 
         {screen === 'playing' && waitingChoice && currentStep && !reflection && (
           <div className="shrink-0 px-3 py-3 border-t-2 space-y-2" style={{ borderColor: 'var(--pa-brown-light)' }}>
-            <p className="text-[10px] font-bold pa-subtitle">这会儿你怎么回？（选完有解说）</p>
+            <p className="text-[10px] font-bold pa-subtitle">哦哦哦</p>
             {currentStep.choices.map((c, i) => (
               <motion.button
                 key={i}

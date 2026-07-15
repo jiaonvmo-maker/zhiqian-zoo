@@ -160,12 +160,15 @@ export function StepKnowledgePanel({
   legacyJargon,
   color,
   showCompanyChip,
+  defaultOpen = true,
 }: {
   terms?: TermItem[];
   tools?: ToolItem[];
   legacyJargon?: { term: string; plain: string }[];
   color: string;
   showCompanyChip?: boolean;
+  /** 有实景示意时默认收起，避免首屏把看板挤没 */
+  defaultOpen?: boolean;
 }) {
   const resolvedTerms: TermItem[] = terms?.length
     ? terms
@@ -173,8 +176,8 @@ export function StepKnowledgePanel({
 
   const hasTools = (tools?.length ?? 0) > 0;
   const [tab, setTab] = useState<Tab>('terms');
-  const [open, setOpen] = useState(true);
-  const [showCollapseHint, setShowCollapseHint] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
+  const [showCollapseHint, setShowCollapseHint] = useState(defaultOpen);
 
   useEffect(() => {
     if (!open || !showCollapseHint) return;
@@ -395,5 +398,3 @@ export function JargonDictionary({ items, color }: { items: { term: string; plai
     </motion.div>
   );
 }
-
-export { companyContext, companyBrief, sprintOneLiner };

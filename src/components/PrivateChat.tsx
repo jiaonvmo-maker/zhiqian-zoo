@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { npcs } from '@/data/npcs';
 import { useGameStore } from '@/store/gameStore';
 import { Heart, X, ArrowRight } from 'lucide-react';
 import { TierBadge } from '@/components/CareerLadder';
 import FluffyAvatar from '@/components/FluffyAvatar';
+import { AnalyticsEvents, track } from '@/analytics';
 
 interface ChatEntry {
   id: string;
@@ -123,7 +124,6 @@ const DEFAULT_SCENARIO = {
 export default function PrivateChat({ npcId, onClose }: { npcId: string; onClose: () => void }) {
   const npc = npcs.find((n) => n.id === npcId);
   const { addNotification } = useGameStore();
-  const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [favor, setFavor] = useState(50);
   const [scenarioIdx, setScenarioIdx] = useState(0);
   const [showOptions, setShowOptions] = useState(true);
@@ -133,10 +133,27 @@ export default function PrivateChat({ npcId, onClose }: { npcId: string; onClose
   const scenarios = PRIVATE_SCENARIOS[npcId] || [DEFAULT_SCENARIO];
   const currentScenario = scenarios[scenarioIdx % scenarios.length];
 
+  // Initialize entries based on the current scenario - reset when scenario changes
+  const initialEntries = useMemo(() => {
+    if (!npc) return [];
+    return [{ id: 'intro', isUser: false, text: currentScenario.intro, mood: 'neutral' as const }];
+  }, [npc, currentScenario.intro]);
+
+  const [entries, setEntries] = useState<ChatEntry[]>(initialEntries);
+
+  // Reset entries when scenario changes
+  useEffect(() => {
+    setEntries(initialEntries);
+  }, [initialEntries]);
+
   useEffect(() => {
     if (!npc) return;
-    setEntries([{ id: 'intro', isUser: false, text: currentScenario.intro, mood: 'neutral' }]);
-  }, [npc, scenarioIdx, currentScenario.intro]);
+    track(AnalyticsEvents.PRIVATE_CHAT_OPEN, {
+      npc_id: npcId,
+      dept_id: npc.departmentId,
+      tier: npc.tier,
+    });
+  }, [npc, npcId]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -155,6 +172,13 @@ export default function PrivateChat({ npcId, onClose }: { npcId: string; onClose
           setScenarioIdx((prev) => prev + 1);
           setShowOptions(true);
         } else {
+          const finalFavor = Math.min(100, Math.max(0, favor + (choice.favor || 0)));
+          track(AnalyticsEvents.PRIVATE_CHAT_COMPLETE, {
+            npc_id: npcId,
+            dept_id: npc?.departmentId ?? '',
+            scenarios_done: scenarios.length,
+            final_favor: finalFavor,
+          });
           setEntries((prev) => [
             ...prev,
             {

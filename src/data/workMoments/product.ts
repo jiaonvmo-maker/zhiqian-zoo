@@ -58,6 +58,9 @@ export const productMoment: WorkMoment = {
       jargon: [
         { term: 'PRD', plain: 'Product Requirement Document，产品需求文档。写清：谁用、干啥、长啥样、啥算做完。' },
         { term: 'MVP', plain: 'Minimum Viable Product，最小可用版本——先上核心功能，别一次堆满。' },
+        { term: 'scope', plain: '范围：这期功能做多大；砍 scope = 只留能上线的核心。' },
+        { term: 'backlog', plain: '待办池——不是不做，是「以后做」、先不进本迭代。' },
+        { term: '人群包', plain: '按条件筛出的一批用户，比如「近 7 天活跃且开了推送」。' },
         { term: '用户故事', plain: '「作为某用户，我想…以便…」——帮研发理解场景。' },
       ],
       pings: [
@@ -90,6 +93,8 @@ export const productMoment: WorkMoment = {
         { term: '评审', plain: '大家一起过需求，挑逻辑漏洞、技术难点、测试点。' },
         { term: '排期', plain: '开发估「要几天做完」。产品据此定上线日。' },
         { term: '对齐', plain: '行业黑话=「确认大家理解一致」。不对齐就开干，后面必扯皮。' },
+        { term: '回归', plain: '改完后再测一遍旧功能，防「修 A 坏 B」——测试常卡这关。' },
+        { term: '神策', plain: '常用用户行为分析工具，看板里看 DAU、漏斗等。' },
       ],
       pings: [
         { from: '柯基·需求又改了', text: '@所有人 推送优化评审 3 点 腾讯会议' },
@@ -152,6 +157,8 @@ export const productMoment: WorkMoment = {
       jargon: [
         { term: '复盘', plain: '事后总结，不是甩锅大会。看数据、看用户反馈、定下一步。' },
         { term: 'A/B 测试', plain: '一半用户看 A 方案、一半看 B，看哪个数据好——用实验代替争吵。' },
+        { term: '对照组', plain: 'A/B 里没改动的那一组用户，用来对比实验组到底有没有变好。' },
+        { term: '全量', plain: '实验结束，确认胜出方案后，对全体用户生效。' },
         { term: '迭代', plain: '一版一版改。互联网产品很少「一次做完」，都是迭代出来的。' },
       ],
       pings: [
@@ -181,12 +188,14 @@ export const productMoment: WorkMoment = {
     processRecap: '产品岗主线：看数据发现问题 → 写 PRD 定义方案 → 评审拉齐研发测试 → 跟进度清 block → 上线复盘迭代。你不是「老板想法的传声筒」，而是对「做没做对」负责的人。',
     keyJargon: [
       { term: 'PRD', plain: '需求文档，研发的施工单' },
-      { term: 'MVP', plain: '最小可用版，先小步验证' },
+      { term: 'MVP / scope', plain: '最小可用版；本迭代做多大' },
+      { term: '人群包 / backlog', plain: '筛选用户群体；待办池' },
+      { term: '神策', plain: '用户行为分析看板工具' },
       { term: '评审 / 对齐', plain: '开会确认大家理解一致' },
       { term: '排期', plain: '啥时候能做完' },
       { term: '漏斗 / 留存 / DAU', plain: '常用数据指标' },
-      { term: 'A/B 测试', plain: '两个方案比数据' },
-      { term: '迭代 / backlog', plain: '一版版改；待办池' },
+      { term: 'A/B 测试 / 对照组 / 全量', plain: '两方案对比；对照组；推全量' },
+      { term: '迭代', plain: '一版版改' },
     ],
     selfCheck: [
       '你能不能把「我要做个功能」写成研发能照着做的文档？',

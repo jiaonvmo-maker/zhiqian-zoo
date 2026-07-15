@@ -340,7 +340,7 @@ export function createSpeechBubble(text: string, color: string): THREE.Mesh {
 }
 
 /* ── Animation state machine ── */
-export function updateAnimal3D(a: Animal3D, t: number, _dt?: number): void {
+export function updateAnimal3D(a: Animal3D, t: number): void {
   const { group, headGroup, leftArm, rightArm, tail, baseY, phase } = a;
   const tp = t + phase;
 

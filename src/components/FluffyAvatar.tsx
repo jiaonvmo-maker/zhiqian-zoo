@@ -1,6 +1,5 @@
 import PartyAnimalAvatar from '@/components/pa3d/PartyAnimalAvatar';
 import { portraitRingStyle } from '@/components/pa3d/avatarFrame';
-import { moodFromPersonality } from '@/components/pa3d/breeds';
 import { assetUrl, defaultAvatar } from '@/data/partyAnimalsAssets';
 
 interface FluffyAvatarProps {
@@ -105,5 +104,3 @@ export default function FluffyAvatar({
     />
   );
 }
-
-export { moodFromPersonality };

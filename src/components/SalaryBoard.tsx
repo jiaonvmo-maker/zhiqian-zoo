@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { departments } from '@/data/departments';
 import PAHeader from '@/components/pa/PAHeader';
 import PABackground from '@/components/pa/PABackground';
+import { AnalyticsEvents, track } from '@/analytics';
 import {
   CITY_OPTIONS,
   COMPANY_TIER_OPTIONS,
@@ -48,6 +49,10 @@ export default function SalaryBoard() {
   const compareRows = useMemo(() => compareAssociateAcrossCompanies(deptId), [deptId]);
   const maxSalary = profile.tiers[profile.tiers.length - 1]?.monthlyMax ?? 100;
 
+  useEffect(() => {
+    track(AnalyticsEvents.SALARY_VIEW, { entry: 'salary_board' }, 'salary');
+  }, []);
+
   return (
     <PABackground variant="warm">
       <PAHeader
@@ -71,7 +76,10 @@ export default function SalaryBoard() {
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setCompanyTier(c.id)}
+                  onClick={() => {
+                    setCompanyTier(c.id);
+                    track(AnalyticsEvents.SALARY_FILTER_CHANGE, { dimension: 'company', value: c.id }, 'salary');
+                  }}
                   className="shrink-0 px-3 py-2.5 rounded-xl text-left min-w-[108px] transition-all"
                   style={{
                     background: companyTier === c.id ? COMPANY_COLORS[c.id] : '#fff',
@@ -97,7 +105,10 @@ export default function SalaryBoard() {
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setCity(c.id)}
+                  onClick={() => {
+                    setCity(c.id);
+                    track(AnalyticsEvents.SALARY_FILTER_CHANGE, { dimension: 'city', value: c.id }, 'salary');
+                  }}
                   className={`px-4 py-2 text-xs font-extrabold rounded-full transition-all ${city === c.id ? 'pa-btn pa-btn-pink' : 'pa-btn pa-btn-cream'}`}
                 >
                   {c.label}
@@ -112,7 +123,10 @@ export default function SalaryBoard() {
               <button
                 key={d.id}
                 type="button"
-                onClick={() => setDeptId(d.id)}
+                onClick={() => {
+                  setDeptId(d.id);
+                  track(AnalyticsEvents.SALARY_FILTER_CHANGE, { dimension: 'dept', value: d.id }, 'salary');
+                }}
                 className="shrink-0 px-3 py-2 rounded-xl text-[11px] font-extrabold transition-all"
                 style={{
                   background: deptId === d.id ? d.color : '#fff',

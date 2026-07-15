@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/gameStore';
 import { surveyQuestions, titleMap, tagPresets } from '@/data/surveyData';
 import PABackground from '@/components/pa/PABackground';
 import FluffyAvatar from '@/components/FluffyAvatar';
+import IdBadge from '@/components/IdBadge';
 import { defaultAvatar } from '@/data/partyAnimalsAssets';
+import { AnalyticsEvents, track } from '@/analytics';
 
 const CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`'.split('');
 
@@ -43,9 +45,13 @@ export default function QuickSurvey() {
   const [displayName, setDisplayName] = useState('');
   const [displayTitle, setDisplayTitle] = useState('');
   const [displayTags, setDisplayTags] = useState<string[]>([]);
-  const badgeRef = useRef<HTMLDivElement>(null);
 
-  const handleAnswer = (trait: string) => {
+  const handleAnswer = (trait: string, questionId: string, optionIndex: number) => {
+    track(AnalyticsEvents.SURVEY_ANSWER, {
+      question_id: questionId,
+      option_index: optionIndex,
+      trait,
+    }, 'survey');
     const newAnswers = [...answers, trait];
     setAnswers(newAnswers);
     if (currentQ < surveyQuestions.length - 1) setCurrentQ(currentQ + 1);
@@ -56,10 +62,8 @@ export default function QuickSurvey() {
     if (!showBadge) return;
     const key = answers.join('+');
     const title = titleMap[key] || '神秘职业动物';
-    const tags = [
-      tagPresets[Math.floor(Math.random() * tagPresets.length)],
-      tagPresets[Math.floor(Math.random() * tagPresets.length)],
-    ];
+    const shuffled = [...tagPresets].sort(() => Math.random() - 0.5);
+    const tags = shuffled.slice(0, 2);
 
     scrambleText('新人_' + Math.floor(Math.random() * 10000), 0.8, setDisplayName);
     setTimeout(() => scrambleText(title, 1.0, setDisplayTitle), 900);
@@ -84,40 +88,36 @@ export default function QuickSurvey() {
 
   if (showBadge) {
     return (
-      <PABackground variant="warm" className="flex items-center justify-center">
-        <motion.div
-          ref={badgeRef}
-          initial={{ scale: 0.5, opacity: 0, rotate: -8 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ type: 'spring', damping: 14, stiffness: 180 }}
-          className="pa-panel pa-panel-accent relative w-80 p-6 sm:p-8 z-10"
-        >
-          <div className="text-center text-5xl mb-3">🎫</div>
+      <PABackground variant="warm" className="flex items-center justify-center overflow-hidden">
+        <IdBadge className="z-10">
+          <p className="pa-id-badge__header">请勿拍打玻璃 · 一日通行证</p>
           <div className="flex items-center gap-4 mb-4">
             <FluffyAvatar src={defaultAvatar} size={64} showExpression={false} />
-            <div>
-              <p className="pa-title text-sm">{displayName}</p>
-              <span className="pa-tag mt-1 inline-block">{displayTitle}</span>
+            <div className="min-w-0">
+              <p className="pa-title text-sm truncate">{displayName || '····'}</p>
+              <span className="pa-tag mt-1 inline-block max-w-full truncate">
+                {displayTitle || '匹配中…'}
+              </span>
             </div>
           </div>
-          <div className="pa-progress-track h-2 mb-4">
+          <div className="pa-progress-track h-2 mb-3">
             <motion.div className="pa-progress-fill" initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 1.2 }} />
           </div>
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4 min-h-[1.75rem]">
             {displayTags.map((tag, i) => (
               <motion.span
-                key={tag}
-                initial={{ opacity: 0, scale: 0.8 }}
+                key={`${tag}-${i}`}
+                initial={{ opacity: 0, scale: 0.88 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 * i }}
-                className="pa-tag-pink text-xs px-3 py-1"
+                transition={{ delay: 0.15 * i, type: 'spring', stiffness: 400, damping: 20 }}
+                className={i % 2 === 0 ? 'pa-tag pa-tag-pink' : 'pa-tag'}
               >
                 {tag}
               </motion.span>
             ))}
           </div>
-          <p className="pa-subtitle text-xs text-center">🐾 正在生成你的职业匹配档案...</p>
-        </motion.div>
+          <p className="pa-subtitle text-xs text-center">正在生成你的职业匹配档案…</p>
+        </IdBadge>
       </PABackground>
     );
   }
@@ -203,7 +203,7 @@ export default function QuickSurvey() {
                   transition={{ delay: 0.1 + i * 0.08 }}
                   whileHover={{ scale: 1.02, x: 4 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => handleAnswer(q.traits[i])}
+                  onClick={() => handleAnswer(q.traits[i], q.id, i)}
                   className="w-full py-3.5 px-5 text-sm pa-btn pa-btn-cream text-left pa-btn-height"
                 >
                   <span className="mr-2 opacity-60 font-semibold">{i === 0 ? 'A' : 'B'}</span>

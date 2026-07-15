@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useGameStore } from '@/store/gameStore';
 import EntryGame from '@/components/EntryGame';
@@ -7,6 +7,7 @@ import DepartmentChat from '@/components/DepartmentChat';
 import MetaBoard from '@/components/MetaBoard';
 import SalaryBoard from '@/components/SalaryBoard';
 import NotificationSystem from '@/components/NotificationSystem';
+import AnalyticsPanel from '@/components/AnalyticsPanel';
 import { LoadingScreen, ErrorFallback, SceneShell } from '@/components/LoadingScreen';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -16,6 +17,19 @@ const WorkstationScene = lazy(() => import('@/components/WorkstationScene'));
 
 export default function App() {
   const phase = useGameStore((s) => s.phase);
+  const [showAnalytics, setShowAnalytics] = useState(
+    () => typeof window !== 'undefined' && window.location.hash === '#pa-data',
+  );
+
+  useEffect(() => {
+    const sync = () => setShowAnalytics(window.location.hash === '#pa-data');
+    window.addEventListener('hashchange', sync);
+    return () => window.removeEventListener('hashchange', sync);
+  }, []);
+
+  if (showAnalytics) {
+    return <AnalyticsPanel />;
+  }
 
   return (
     <div className="w-full h-screen overflow-hidden pa-bg-lobby">
